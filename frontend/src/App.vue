@@ -46,16 +46,26 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { Shop, Dish, Box, Search, Setting, User } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const token = localStorage.getItem('token')
-const user = JSON.parse(localStorage.getItem('user') || '{}')
-const isLoggedIn = ref(!!token)
-const isAdmin = ref(user.role === 'admin')
-const username = ref(user.username || '')
+const token = ref(localStorage.getItem('token'))
+const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+const isLoggedIn = ref(!!token.value)
+const isAdmin = ref(user.value.role === 'admin')
+const username = ref(user.value.username || '')
+
+watch(() => router.currentRoute.value.path, () => {
+  const t = localStorage.getItem('token')
+  const u = JSON.parse(localStorage.getItem('user') || '{}')
+  token.value = t
+  user.value = u
+  isLoggedIn.value = !!t
+  isAdmin.value = u.role === 'admin'
+  username.value = u.username || ''
+})
 
 const logout = () => {
   localStorage.removeItem('token')
