@@ -82,6 +82,17 @@ class CanFood(Base):
     flavor = relationship("Flavor", back_populates="cans")
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    password_hash = Column(String(256), nullable=False)
+    role = Column(String(20), default='user')   # admin / user
+    status = Column(String(20), default='active')  # active / inactive
+    created_date = Column(Text, nullable=True)
+
+
 class Standard(Base):
     __tablename__ = "standards"
 
