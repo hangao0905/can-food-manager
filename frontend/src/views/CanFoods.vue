@@ -4,17 +4,20 @@
     <el-card class="filter-card">
       <el-form :inline="true" :model="filterForm">
         <el-form-item label="品牌">
-          <el-select v-model="filterForm.brand_code" placeholder="全部" clearable style="width: 140px" @change="onBrandFilterChange">
+          <el-select v-model="filterForm.brand_code" placeholder="全部" clearable style="width: 180px" @change="onBrandFilterChange">
             <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
           </el-select>
         </el-form-item>
         <el-form-item label="口味">
-          <el-select v-model="filterForm.flavor_code" placeholder="全部" clearable style="width: 140px">
+          <el-select v-model="filterForm.flavor_code" placeholder="全部" clearable style="width: 180px">
             <el-option v-for="f in filterFlavors" :key="f.code" :label="f.name" :value="f.code" />
           </el-select>
         </el-form-item>
-        <el-form-item label="蛋白质合格">
-          <el-select v-model="filterForm.protein_pass" placeholder="全部" clearable style="width: 100px">
+        <el-form-item label="罐头名称">
+          <el-input v-model="filterForm.keyword" placeholder="模糊搜索罐头简介" clearable style="width: 160px" />
+        </el-form-item>
+        <el-form-item label="蛋白合格">
+          <el-select v-model="filterForm.protein_pass" placeholder="全部" clearable style="width: 120px">
             <el-option value="合格" label="合格" />
             <el-option value="不合格" label="不合格" />
           </el-select>
@@ -139,7 +142,7 @@ const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
 const dialogFlavors = ref([])
-const filterForm = ref({ brand_code: '', flavor_code: '', protein_pass: '', creator: '' })
+const filterForm = ref({ brand_code: '', flavor_code: '', keyword: '', protein_pass: '', creator: '' })
 const pagination = ref({ page: 1, pageSize: 20 })
 const form = ref(getDefaultForm())
 
@@ -174,6 +177,7 @@ const filteredData = computed(() => {
     if (filterForm.value.brand_code && c.brand_code !== filterForm.value.brand_code) return false
     if (filterForm.value.flavor_code && c.flavor_code !== filterForm.value.flavor_code) return false
     if (filterForm.value.protein_pass && c.protein_pass !== filterForm.value.protein_pass) return false
+    if (filterForm.value.keyword && !c.description?.includes(filterForm.value.keyword)) return false
     if (filterForm.value.creator && !c.creator?.includes(filterForm.value.creator)) return false
     return true
   })
@@ -205,7 +209,7 @@ const loadFlavors = async () => {
 }
 
 const handleSearch = () => { pagination.value.page = 1 }
-const handleReset = () => { filterForm.value = { brand_code: '', flavor_code: '', protein_pass: '', creator: '' }; pagination.value.page = 1 }
+const handleReset = () => { filterForm.value = { brand_code: '', flavor_code: '', keyword: '', protein_pass: '', creator: '' }; pagination.value.page = 1 }
 
 const showDialog = (type, row = null) => {
   dialogType.value = type
