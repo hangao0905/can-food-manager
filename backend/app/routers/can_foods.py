@@ -248,28 +248,25 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
         next_num = 1
     new_code = int(f"{today}{next_num:03d}")
 
-    # 计算派生营养字段（不对原始data做mutation）
-    dry = {k: v for k, v in data.dict(exclude_none=True).items()}
-    calc = _calc_nutrients(dry, db)
+    # 计算派生营养字段（copy避免mutation）
+    import copy
+    input_dict = copy.deepcopy(data.dict(exclude_none=True))
+    calc = _calc_nutrients(input_dict, db)
+    # 分离输入字段和计算字段
+    input_fields = {k: v for k, v in calc.items()
+                    if k in ('protein','fat','ash','fiber','moisture',
+                             'calcium_wet','phosphorus_wet','nfe_wet','labeled_kcal')}
+    calc_only = {k: v for k, v in calc.items()
+                 if k not in input_fields}
     db_obj = CanFoodModel(
         code=new_code,
         creator=current_user['username'],
         brand_code=data.brand_code,
         flavor_code=data.flavor_code,
         description=data.description,
-        protein=data.protein,
-        fat=data.fat,
-        ash=data.ash,
-        fiber=data.fiber,
-        moisture=data.moisture,
-        calcium_wet=data.calcium_wet,
-        phosphorus_wet=data.phosphorus_wet,
-        nfe_wet=data.nfe_wet,
-        labeled_kcal=data.labeled_kcal,
         photo=data.photo,
-        **{k: v for k, v in calc.items()
-           if k not in ('protein','fat','ash','fiber','moisture',
-                        'calcium_wet','phosphorus_wet','nfe_wet','labeled_kcal')}
+        **input_fields,
+        **calc_only
     )
     db.add(db_obj)
     db.commit()
@@ -279,40 +276,6 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
     return to_dict(c)
 
 
-@router.post("/", dependencies=[Depends(get_current_user)])
-def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    today = datetime.date.today().strftime('%Y%m%d')
-    prefix = f"{today}%"
-    last = db.query(CanFoodModel).filter(CanFoodModel.code.like(prefix)).order_by(CanFoodModel.code.desc()).first()
-    next_num = int(str(last.code)[-3:]) + 1 if last else 1
-    new_code = int(f"{today}{next_num:03d}")
-    nutrition_data = _calc_nutrients(data.dict(exclude_none=True), db)
-    db_obj = CanFoodModel(
-        code=new_code,
-        creator=current_user['username'],
-        brand_code=data.brand_code,
-        flavor_code=data.flavor_code,
-        description=data.description,
-        protein=data.protein,
-        fat=data.fat,
-        ash=data.ash,
-        fiber=data.fiber,
-        moisture=data.moisture,
-        calcium_wet=data.calcium_wet,
-        phosphorus_wet=data.phosphorus_wet,
-        nfe_wet=data.nfe_wet,
-        labeled_kcal=data.labeled_kcal,
-        photo=data.photo,
-        **nutrition_data
-    )
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
-    c = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor)).filter(CanFoodModel.code == new_code).first()
-    return to_dict(c)
-
-
-@router.get("/")
 def list_can_foods(page: int = 1, page_size: int = 50, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     query = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor))
     skip = (page - 1) * page_size

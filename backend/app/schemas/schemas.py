@@ -97,8 +97,20 @@ class CanFoodBase(BaseModel):
     photo: Optional[str] = None
 
 
-class CanFoodCreate(CanFoodBase):
-    pass
+class CanFoodCreate(BaseModel):
+    brand_code: int
+    flavor_code: Optional[int] = None
+    description: Optional[str] = None
+    protein: Optional[float] = None
+    fat: Optional[float] = None
+    ash: Optional[float] = None
+    fiber: Optional[float] = None
+    moisture: Optional[float] = None
+    calcium_wet: Optional[float] = None
+    phosphorus_wet: Optional[float] = None
+    nfe_wet: Optional[float] = None
+    labeled_kcal: Optional[float] = None
+    photo: Optional[str] = None
 
 
 class CanFoodUpdate(BaseModel):
