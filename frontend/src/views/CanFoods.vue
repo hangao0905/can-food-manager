@@ -9,27 +9,21 @@
       </template>
       
       <el-table :data="canFoods" stripe v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" label="罐头名称" min-width="150" />
-        <el-table-column prop="flavor.brand.name" label="品牌" width="100" />
+        <el-table-column prop="code" label="ID" width="100" />
+        <el-table-column prop="brand.name" label="品牌" width="120" />
         <el-table-column prop="flavor.name" label="口味" width="100" />
-        <el-table-column prop="calories" label="热量" width="80">
-          <template #default="{ row }">{{ row.calories || '-' }}</template>
+        <el-table-column prop="description" label="简介" show-overflow-tooltip min-width="200" />
+        <el-table-column prop="protein_pass" label="粗蛋白" width="80">
+          <template #default="{ row }">{{ row.protein_pass || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="protein" label="蛋白质" width="80">
-          <template #default="{ row }">{{ row.protein || '-' }}</template>
+        <el-table-column prop="fat_pass" label="粗脂肪" width="80">
+          <template #default="{ row }">{{ row.fat_pass || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="fat" label="脂肪" width="80">
-          <template #default="{ row }">{{ row.fat || '-' }}</template>
+        <el-table-column prop="fiber_pass" label="粗纤维" width="80">
+          <template #default="{ row }">{{ row.fiber_pass || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="is_quality_passed" label="合格" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.is_quality_passed ? 'success' : 'danger'">
-              {{ row.is_quality_passed ? '是' : '否' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column prop="creator" label="创建人" width="100" />
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
             <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
@@ -38,91 +32,29 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="700px" @closed="resetForm">
-      <el-form :model="form" label-width="100px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="600px">
+      <el-form :model="form" label-width="90px">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="罐头名称">
-              <el-input v-model="form.name" />
+            <el-form-item label="品牌">
+              <el-select v-model="form.brand_code" placeholder="请选择品牌" @change="onBrandChange">
+                <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="口味">
-              <el-select v-model="form.flavor_id" placeholder="请选择口味">
-                <el-option v-for="f in flavors" :key="f.id" :label="`${f.brand?.name || ''} - ${f.name}`" :value="f.id" />
+              <el-select v-model="form.flavor_code" placeholder="请先选品牌">
+                <el-option v-for="f in filteredFlavors" :key="f.code" :label="f.name" :value="f.code" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="条形码">
-              <el-input v-model="form.barcode" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="净重(g)">
-              <el-input-number v-model="form.net_weight" :min="0" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-divider content-position="left">营养成分 (每100g)</el-divider>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="热量(kcal)">
-              <el-input-number v-model="form.calories" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="蛋白质(g)">
-              <el-input-number v-model="form.protein" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="脂肪(g)">
-              <el-input-number v-model="form.fat" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="碳水(g)">
-              <el-input-number v-model="form.carbohydrate" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="水分(g)">
-              <el-input-number v-model="form.moisture" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="磷(mg)">
-              <el-input-number v-model="form.phosphorus" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="钙(mg)">
-              <el-input-number v-model="form.calcium" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="沥干重(g)">
-              <el-input-number v-model="form.drained_weight" :min="0" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="合格">
-              <el-switch v-model="form.is_quality_passed" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="合格说明">
-          <el-input v-model="form.quality_notes" />
-        </el-form-item>
         <el-form-item label="简介">
           <el-input v-model="form.description" type="textarea" rows="3" />
+        </el-form-item>
+        <el-form-item label="创建人">
+          <el-input v-model="form.creator" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -136,31 +68,31 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { canFoodApi, flavorApi } from '../api'
+import { canFoodApi, brandApi, flavorApi } from '../api'
 
 const canFoods = ref([])
+const brands = ref([])
 const flavors = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
-const form = ref({
-  name: '', flavor_id: '', barcode: '', net_weight: null, drained_weight: null,
-  calories: null, protein: null, fat: null, carbohydrate: null, moisture: null,
-  phosphorus: null, calcium: null, is_quality_passed: true, quality_notes: '', description: ''
-})
+const form = ref({ brand_code: '', flavor_code: '', description: '', creator: '' })
 
 const dialogTitle = computed(() => dialogType.value === 'create' ? '新增罐头' : '编辑罐头')
 
-const defaultForm = () => ({
-  name: '', flavor_id: '', barcode: '', net_weight: null, drained_weight: null,
-  calories: null, protein: null, fat: null, carbohydrate: null, moisture: null,
-  phosphorus: null, calcium: null, is_quality_passed: true, quality_notes: '', description: ''
+const filteredFlavors = computed(() => {
+  if (!form.value.brand_code) return []
+  return flavors.value.filter(f => f.brand_code === form.value.brand_code)
 })
+
+const onBrandChange = () => {
+  form.value.flavor_code = ''
+}
 
 const loadCanFoods = async () => {
   loading.value = true
   try {
-    const { data } = await canFoodApi.list({ page_size: 100 })
+    const { data } = await canFoodApi.list()
     canFoods.value = data
   } catch (error) {
     ElMessage.error('加载罐头失败')
@@ -169,9 +101,18 @@ const loadCanFoods = async () => {
   }
 }
 
+const loadBrands = async () => {
+  try {
+    const { data } = await brandApi.list()
+    brands.value = data
+  } catch (error) {
+    console.error('加载品牌失败', error)
+  }
+}
+
 const loadFlavors = async () => {
   try {
-    const { data } = await flavorApi.list({ page_size: 100 })
+    const { data } = await flavorApi.list()
     flavors.value = data
   } catch (error) {
     console.error('加载口味失败', error)
@@ -181,25 +122,20 @@ const loadFlavors = async () => {
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { ...row }
+    form.value = { code: row.code, brand_code: row.brand_code, flavor_code: row.flavor_code, description: row.description || '', creator: row.creator || '' }
   } else {
-    form.value = defaultForm()
+    form.value = { brand_code: '', flavor_code: '', description: '', creator: '' }
   }
   dialogVisible.value = true
 }
 
-const resetForm = () => {
-  form.value = defaultForm()
-}
-
 const handleSubmit = async () => {
   try {
-    const data = { ...form.value }
     if (dialogType.value === 'create') {
-      await canFoodApi.create(data)
+      await canFoodApi.create(form.value)
       ElMessage.success('创建成功')
     } else {
-      await canFoodApi.update(data.id, data)
+      await canFoodApi.update(form.value.code, form.value)
       ElMessage.success('更新成功')
     }
     dialogVisible.value = false
@@ -212,7 +148,7 @@ const handleSubmit = async () => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm('确定删除该罐头?', '提示', { type: 'warning' })
-    await canFoodApi.delete(row.id)
+    await canFoodApi.delete(row.code)
     ElMessage.success('删除成功')
     loadCanFoods()
   } catch (error) {
@@ -224,6 +160,7 @@ const handleDelete = async (row) => {
 
 onMounted(() => {
   loadCanFoods()
+  loadBrands()
   loadFlavors()
 })
 </script>
