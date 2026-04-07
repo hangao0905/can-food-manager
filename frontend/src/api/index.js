@@ -19,12 +19,15 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
+      // 清除登录状态
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-      window.location.href = '/login'
-      // 标记为已处理，阻止组件 catch 块显示错误
+      // 标记已处理，防止组件弹出错误提示
       error.config._handled = true
-      return Promise.reject(error)
+      // 用 setTimeout(0) 确保在 Promise 链之外执行 redirect
+      setTimeout(() => {
+        window.location.href = window.location.origin + '/login'
+      }, 0)
     }
     return Promise.reject(error)
   }
