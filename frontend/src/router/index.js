@@ -35,6 +35,10 @@ const routes = [
     component: () => import('../views/Standards.vue'),
   },
   {
+    path: '/compare',
+    component: () => import('../views/Compare.vue'),
+  },
+  {
     path: '/users',
     component: () => import('../views/Users.vue'),
   },
