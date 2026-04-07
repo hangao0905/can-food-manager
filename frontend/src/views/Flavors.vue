@@ -83,7 +83,7 @@ const loadBrands = async () => {
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { name: row.name, brand_code: row.brand_code, creator: row.creator || '' }
+    form.value = { code: row.code, name: row.name, brand_code: row.brand_code, creator: row.creator || '' }
   } else {
     form.value = { name: '', brand_code: '', creator: '' }
   }
