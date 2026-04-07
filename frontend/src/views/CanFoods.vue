@@ -235,86 +235,194 @@
           <input ref="photoInput" type="file" accept="image/*" style="display:none" @change="e=>handlePhotoUpload(e,'photo')" />
         </el-form-item>
 
-        <el-divider content-position="left">
-          自动计算值
-          <el-tooltip placement="top" raw-content>
-            <template #content>
-              <div style="font-size:12px;line-height:1.8;max-width:480px">
-                <b>【干物质换算】</b><br/>
-                干物质 = 1 - 水分<br/>
-                X(干基) = X(湿基) / 干物质<br/><br/>
-                <b>【代谢能 kcal/kg】</b><br/>
-                蛋白kcal = 蛋白×3.5×100×10<br/>
-                脂肪kcal = 脂肪×8.5×100×10<br/>
-                碳水kcal = NFE×3.5×100×10<br/>
-                总热量 = 三者之和<br/><br/>
-                <b>【各营养素代谢能占比】</b><br/>
-                占比 = 该类kcal / 总热量<br/><br/>
-                <b>【钙磷比】</b><br/>
-                钙磷比 = 钙(湿基) / 磷(湿基)<br/><br/>
-                <b>【mg/1000kcal】</b><br/>
-                X mg/1000kal = X(湿基)×1000×10/总热量<br/><br/>
-                <b>【磷水平】</b><br/>
-                &gt;2400mg → 高磷，&lt;1800mg → 低磷<br/><br/>
-                <b>【蛋白:脂肪比】</b><br/>
-                比值 = 蛋白(湿基) / 脂肪(湿基)<br/><br/>
-                <b>【蛋白水平】</b><br/>
-                比值&gt;3.0 → 优秀，&gt;1.5 → 一般<br/>
-                比值≤1.5 → 不合格
-              </div>
-            </template>
-            <el-icon style="margin-left:8px;cursor:pointer;color:#909399"><el-icon-question-filled /></el-icon>
-          </el-tooltip>
-        </el-divider>
+        <el-divider content-position="left">自动计算值</el-divider>
         <el-row :gutter="12">
-          <el-col :span="6"><el-form-item label="钙磷比"><el-input :model-value="form.ca_ph_ratio != null ? form.ca_ph_ratio.toFixed(4) : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="蛋白-干基"><el-input :model-value="form.protein_dm != null ? (form.protein_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="脂肪-干基"><el-input :model-value="form.fat_dm != null ? (form.fat_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="灰分-干基"><el-input :model-value="form.ash_dm != null ? (form.ash_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="NFE-干基"><el-input :model-value="form.nfe_dm != null ? (form.nfe_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="钙-干基"><el-input :model-value="form.calcium_dm != null ? (form.calcium_dm*100).toFixed(3)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="磷-干基"><el-input :model-value="form.phosphorus_dm != null ? (form.phosphorus_dm*100).toFixed(3)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="钙mg/1000kal"><el-input :model-value="form.calcium_per_1000kal != null ? form.calcium_per_1000kal.toFixed(1) : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="磷mg/1000kal"><el-input :model-value="form.phosphorus_per_1000kal != null ? form.phosphorus_per_1000kal.toFixed(1) : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="磷水平"><el-input :model-value="form.phosphorus_level || '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="1kg总热量"><el-input :model-value="form.total_energy_kcal != null ? Math.round(form.total_energy_kcal)+'kcal/kg' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="标注kcal"><el-input :model-value="form.labeled_kcal != null ? form.labeled_kcal : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="蛋白kcal"><el-input :model-value="form.protein_kcal != null ? Math.round(form.protein_kcal) : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="脂肪kcal"><el-input :model-value="form.fat_kcal != null ? Math.round(form.fat_kcal) : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="碳水kcal"><el-input :model-value="form.carb_kcal != null ? Math.round(form.carb_kcal) : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="蛋白代谢能%"><el-input :model-value="form.protein_met_energy_pct != null ? (form.protein_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="脂肪代谢能%"><el-input :model-value="form.fat_met_energy_pct != null ? (form.fat_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="碳水代谢能%"><el-input :model-value="form.carb_met_energy_pct != null ? (form.carb_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="蛋白:脂肪"><el-input :model-value="form.protein_fat_ratio != null ? form.protein_fat_ratio.toFixed(2) : '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="蛋白水平"><el-input :model-value="form.protein_level || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            钙磷比
+            <el-tooltip content="钙(湿基) / 磷(湿基)" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.ca_ph_ratio != null ? form.ca_ph_ratio.toFixed(4) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            蛋白-干基
+            <el-tooltip content="蛋白(湿基) / 干物质" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.protein_dm != null ? (form.protein_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            脂肪-干基
+            <el-tooltip content="脂肪(湿基) / 干物质" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.fat_dm != null ? (form.fat_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            灰分-干基
+            <el-tooltip content="灰分(湿基) / 干物质" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.ash_dm != null ? (form.ash_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            NFE-干基
+            <el-tooltip content="NFE(湿基) / 干物质" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.nfe_dm != null ? (form.nfe_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            钙-干基
+            <el-tooltip content="钙(湿基) / 干物质" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.calcium_dm != null ? (form.calcium_dm*100).toFixed(3)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            磷-干基
+            <el-tooltip content="磷(湿基) / 干物质" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.phosphorus_dm != null ? (form.phosphorus_dm*100).toFixed(3)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            钙mg/1000kal
+            <el-tooltip content="钙(湿基)×1000×10 / 总热量" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.calcium_per_1000kal != null ? form.calcium_per_1000kal.toFixed(1) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            磷mg/1000kal
+            <el-tooltip content="磷(湿基)×1000×10 / 总热量" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.phosphorus_per_1000kal != null ? form.phosphorus_per_1000kal.toFixed(1) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            磷水平
+            <el-tooltip content="磷mg/1000kal &gt;2400 高磷, &lt;1800 低磷" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.phosphorus_level || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            1kg总热量
+            <el-tooltip content="蛋白kcal+脂肪kcal+碳水kcal" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.total_energy_kcal != null ? Math.round(form.total_energy_kcal)+'kcal/kg' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            标注kcal
+            <el-tooltip content="人工输入的标注热量值" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.labeled_kcal != null ? form.labeled_kcal : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            蛋白kcal
+            <el-tooltip content="蛋白×3.5×100×10" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.protein_kcal != null ? Math.round(form.protein_kcal) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            脂肪kcal
+            <el-tooltip content="脂肪×8.5×100×10" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.fat_kcal != null ? Math.round(form.fat_kcal) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            碳水kcal
+            <el-tooltip content="NFE×3.5×100×10" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.carb_kcal != null ? Math.round(form.carb_kcal) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            蛋白代谢能%
+            <el-tooltip content="蛋白kcal / 总热量" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.protein_met_energy_pct != null ? (form.protein_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            脂肪代谢能%
+            <el-tooltip content="脂肪kcal / 总热量" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.fat_met_energy_pct != null ? (form.fat_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            碳水代谢能%
+            <el-tooltip content="碳水kcal / 总热量" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.carb_met_energy_pct != null ? (form.carb_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            蛋白:脂肪
+            <el-tooltip content="蛋白(湿基) / 脂肪(湿基)" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.protein_fat_ratio != null ? form.protein_fat_ratio.toFixed(2) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            蛋白水平
+            <el-tooltip content="比值&gt;3.0优秀, &gt;1.5一般, ≤1.5不合格" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.protein_level || '-'" disabled /></el-form-item></el-col>
         </el-row>
 
-        <el-divider content-position="left">
-          合格指标（依据标准规则自动判定）
-          <el-tooltip placement="top" raw-content>
-            <template #content>
-              <div style="font-size:12px;line-height:1.8;max-width:400px">
-                各项合格指标由系统在「营养标准」页面<br/>
-                配置的规则自动判断<br/><br/>
-                <b>常见判断逻辑：</b><br/>
-                · 蛋白 ≥ 10% → 合格<br/>
-                · 脂肪 ≤ 9% → 合格<br/>
-                · 纤维 ≤ 3% → 合格<br/>
-                · 灰分 ≤ 2% → 合格<br/>
-                · 水分 ≤ 80% → 合格<br/>
-                · 钙磷比在 1.1~1.4 之间 → 合格
-              </div>
-            </template>
-            <el-icon style="margin-left:8px;cursor:pointer;color:#909399"><el-icon-question-filled /></el-icon>
-          </el-tooltip>
-        </el-divider>
+        <el-divider content-position="left">合格指标</el-divider>
         <el-row :gutter="12">
-          <el-col :span="6"><el-form-item label="蛋白合格"><el-input :model-value="form.protein_pass || '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="脂肪合格"><el-input :model-value="form.fat_pass || '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="纤维合格"><el-input :model-value="form.fiber_pass || '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="灰分合格"><el-input :model-value="form.ash_pass || '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="水分合格"><el-input :model-value="form.moisture_pass || '-'" disabled /></el-form-item></el-col>
-          <el-col :span="6"><el-form-item label="钙磷合格"><el-input :model-value="form.ca_ph_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            蛋白合格
+            <el-tooltip content="依据标准规则自动判定" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.protein_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            脂肪合格
+            <el-tooltip content="依据标准规则自动判定" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.fat_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            纤维合格
+            <el-tooltip content="依据标准规则自动判定" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.fiber_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            灰分合格
+            <el-tooltip content="依据标准规则自动判定" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.ash_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            水分合格
+            <el-tooltip content="依据标准规则自动判定" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.moisture_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item >          <template #label>
+            钙磷合格
+            <el-tooltip content="钙磷比在 1.1~1.4 之间为合格" placement="top">
+              <el-icon style="margin-left:4px;cursor:pointer;color:#909399"><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </template>
+            <el-input :model-value="form.ca_ph_pass || '-'" disabled /></el-form-item></el-col>
         </el-row>
       </el-form>
       <template #footer>
@@ -328,6 +436,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { QuestionFilled } from '@element-plus/icons-vue'
 import { canFoodApi, brandApi, flavorApi } from '../api'
 
 const canFoods = ref([])
