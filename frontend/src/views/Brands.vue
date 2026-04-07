@@ -9,17 +9,9 @@
       </template>
       
       <el-table :data="brands" stripe v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="code" label="ID" width="80" />
         <el-table-column prop="name" label="品牌名称" />
-        <el-table-column prop="country" label="产地" />
-        <el-table-column prop="description" label="描述" show-overflow-tooltip />
-        <el-table-column prop="is_active" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.is_active ? 'success' : 'info'">
-              {{ row.is_active ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
+        <el-table-column prop="created_date" label="创建日期" width="160" />
         <el-table-column label="操作" width="180">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
@@ -33,12 +25,6 @@
       <el-form :model="form" label-width="80px">
         <el-form-item label="品牌名称">
           <el-input v-model="form.name" />
-        </el-form-item>
-        <el-form-item label="产地">
-          <el-input v-model="form.country" />
-        </el-form-item>
-        <el-form-item label="描述">
-          <el-input v-model="form.description" type="textarea" rows="3" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -58,7 +44,7 @@ const brands = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
-const form = ref({ name: '', country: '', description: '' })
+const form = ref({ name: '' })
 
 const dialogTitle = computed(() => dialogType.value === 'create' ? '新增品牌' : '编辑品牌')
 
@@ -77,9 +63,9 @@ const loadBrands = async () => {
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { ...row }
+    form.value = { code: row.code, name: row.name }
   } else {
-    form.value = { name: '', country: '', description: '' }
+    form.value = { name: '' }
   }
   dialogVisible.value = true
 }
@@ -90,7 +76,7 @@ const handleSubmit = async () => {
       await brandApi.create(form.value)
       ElMessage.success('创建成功')
     } else {
-      await brandApi.update(form.value.id, form.value)
+      await brandApi.update(form.value.code, form.value)
       ElMessage.success('更新成功')
     }
     dialogVisible.value = false
@@ -103,7 +89,7 @@ const handleSubmit = async () => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm('确定删除该品牌?', '提示', { type: 'warning' })
-    await brandApi.delete(row.id)
+    await brandApi.delete(row.code)
     ElMessage.success('删除成功')
     loadBrands()
   } catch (error) {

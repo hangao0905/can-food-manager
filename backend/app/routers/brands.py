@@ -27,6 +27,16 @@ def get_brand(brand_code: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="品牌不存在")
     return {"code": brand.code, "name": brand.name, "created_date": brand.created_date}
 
+@router.post("/")
+def create_brand(data: BrandUpdate, db: Session = Depends(get_db)):
+    max_code = db.query(BrandModel.code).order_by(BrandModel.code.desc()).first()
+    new_code = (max_code[0] + 1) if max_code else 1
+    brand = BrandModel(code=new_code, name=data.name, created_date=data.created_date)
+    db.add(brand)
+    db.commit()
+    db.refresh(brand)
+    return {"code": brand.code, "name": brand.name, "created_date": brand.created_date}
+
 @router.put("/{brand_code}")
 def update_brand(brand_code: int, data: BrandUpdate, db: Session = Depends(get_db)):
     brand = db.query(BrandModel).filter(BrandModel.code == brand_code).first()
@@ -39,3 +49,12 @@ def update_brand(brand_code: int, data: BrandUpdate, db: Session = Depends(get_d
     db.commit()
     db.refresh(brand)
     return {"code": brand.code, "name": brand.name, "created_date": brand.created_date}
+
+@router.delete("/{brand_code}")
+def delete_brand(brand_code: int, db: Session = Depends(get_db)):
+    brand = db.query(BrandModel).filter(BrandModel.code == brand_code).first()
+    if not brand:
+        raise HTTPException(status_code=404, detail="品牌不存在")
+    db.delete(brand)
+    db.commit()
+    return {"message": "删除成功"}

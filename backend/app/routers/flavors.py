@@ -41,6 +41,16 @@ def get_flavor(flavor_code: int, db: Session = Depends(get_db)):
         item["brand"] = {"code": flavor.brand.code, "name": flavor.brand.name, "created_date": flavor.brand.created_date}
     return item
 
+@router.post("/")
+def create_flavor(data: FlavorUpdate, db: Session = Depends(get_db)):
+    max_code = db.query(FlavorModel.code).order_by(FlavorModel.code.desc()).first()
+    new_code = (max_code[0] + 1) if max_code else 1
+    flavor = FlavorModel(code=new_code, name=data.name, brand_code=data.brand_code, creator=data.creator, photo=data.photo)
+    db.add(flavor)
+    db.commit()
+    db.refresh(flavor)
+    return {"code": flavor.code, "name": flavor.name, "brand_code": flavor.brand_code, "photo": flavor.photo, "creator": flavor.creator, "created_date": flavor.created_date}
+
 @router.put("/{flavor_code}")
 def update_flavor(flavor_code: int, data: FlavorUpdate, db: Session = Depends(get_db)):
     flavor = db.query(FlavorModel).filter(FlavorModel.code == flavor_code).first()
@@ -57,3 +67,12 @@ def update_flavor(flavor_code: int, data: FlavorUpdate, db: Session = Depends(ge
     db.commit()
     db.refresh(flavor)
     return {"code": flavor.code, "name": flavor.name, "brand_code": flavor.brand_code, "photo": flavor.photo, "creator": flavor.creator, "created_date": flavor.created_date}
+
+@router.delete("/{flavor_code}")
+def delete_flavor(flavor_code: int, db: Session = Depends(get_db)):
+    flavor = db.query(FlavorModel).filter(FlavorModel.code == flavor_code).first()
+    if not flavor:
+        raise HTTPException(status_code=404, detail="口味不存在")
+    db.delete(flavor)
+    db.commit()
+    return {"message": "删除成功"}
