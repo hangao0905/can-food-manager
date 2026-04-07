@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+import datetime
 from sqlalchemy.orm import Session, joinedload
 from pydantic import BaseModel
 from typing import Optional
@@ -217,6 +218,28 @@ def to_dict(c):
     if c.flavor:
         r["flavor"] = {"code": c.flavor.code, "name": c.flavor.name}
     return r
+
+
+@router.post("/")
+def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    # 生成新 code（格式：yyyymmddnnn，如 20260407001）
+    today = datetime.date.today().strftime('%Y%m%d')
+    prefix = f"{today}%"
+    last = db.query(CanFoodModel).filter(CanFoodModel.code.like(prefix)).order_by(CanFoodModel.code.desc()).first()
+    if last:
+        next_num = int(str(last.code)[-3:]) + 1
+    else:
+        next_num = 1
+    new_code = int(f"{today}{next_num:03d}")
+
+    nutrition_data = _calc_nutrients(data.dict(), db)
+    db_obj = CanFoodModel(code=new_code, creator=current_user['username'], **data.dict(), **nutrition_data)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    # 重新查询以获取关联的 brand 和 flavor
+    c = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor)).filter(CanFoodModel.code == new_code).first()
+    return to_dict(c)
 
 
 @router.get("/")
