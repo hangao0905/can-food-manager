@@ -9,10 +9,11 @@
       </template>
       
       <el-table :data="flavors" stripe v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="code" label="ID" width="80" />
         <el-table-column prop="name" label="口味名称" />
         <el-table-column prop="brand.name" label="所属品牌" />
-        <el-table-column prop="description" label="描述" show-overflow-tooltip />
+        <el-table-column prop="creator" label="创建人" width="100" />
+        <el-table-column prop="created_date" label="创建日期" width="160" />
         <el-table-column label="操作" width="180">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
@@ -28,12 +29,12 @@
           <el-input v-model="form.name" />
         </el-form-item>
         <el-form-item label="所属品牌">
-          <el-select v-model="form.brand_id" placeholder="请选择品牌">
-            <el-option v-for="b in brands" :key="b.id" :label="b.name" :value="b.id" />
+          <el-select v-model="form.brand_code" placeholder="请选择品牌">
+            <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
           </el-select>
         </el-form-item>
-        <el-form-item label="描述">
-          <el-input v-model="form.description" type="textarea" rows="3" />
+        <el-form-item label="创建人">
+          <el-input v-model="form.creator" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -54,7 +55,7 @@ const brands = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
-const form = ref({ name: '', brand_id: '', description: '' })
+const form = ref({ name: '', brand_code: '', creator: '' })
 
 const dialogTitle = computed(() => dialogType.value === 'create' ? '新增口味' : '编辑口味')
 
@@ -82,9 +83,9 @@ const loadBrands = async () => {
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { ...row }
+    form.value = { name: row.name, brand_code: row.brand_code, creator: row.creator || '' }
   } else {
-    form.value = { name: '', brand_id: '', description: '' }
+    form.value = { name: '', brand_code: '', creator: '' }
   }
   dialogVisible.value = true
 }
@@ -95,7 +96,7 @@ const handleSubmit = async () => {
       await flavorApi.create(form.value)
       ElMessage.success('创建成功')
     } else {
-      await flavorApi.update(form.value.id, form.value)
+      await flavorApi.update(form.value.code, form.value)
       ElMessage.success('更新成功')
     }
     dialogVisible.value = false
@@ -108,7 +109,7 @@ const handleSubmit = async () => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm('确定删除该口味?', '提示', { type: 'warning' })
-    await flavorApi.delete(row.id)
+    await flavorApi.delete(row.code)
     ElMessage.success('删除成功')
     loadFlavors()
   } catch (error) {
