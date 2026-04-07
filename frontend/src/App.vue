@@ -29,6 +29,10 @@
           <el-icon><Search /></el-icon>
           <span>组合查询</span>
         </el-menu-item>
+        <el-menu-item index="/compare">
+          <el-icon><DataAnalysis /></el-icon>
+          <span>罐头对比</span>
+        </el-menu-item>
         <el-menu-item index="/standards">
           <el-icon><Setting /></el-icon>
           <span>计算标准</span>
@@ -51,7 +55,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { HomeFilled, Shop, Dish, Box, Search, Setting, User } from '@element-plus/icons-vue'
+import { HomeFilled, Shop, Dish, Box, Search, Setting, User, DataAnalysis } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
