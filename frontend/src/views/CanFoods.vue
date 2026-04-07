@@ -506,7 +506,7 @@ const loadCanFoods = async () => {
     const { data } = await canFoodApi.list()
     canFoods.value = data
   } catch (error) {
-    ElMessage.error('加载罐头失败')
+    if (!error.config?._handled) ElMessage.error('加载罐头失败')
   } finally {
     loading.value = false
   }
@@ -581,7 +581,7 @@ const handleSubmit = async () => {
     dialogVisible.value = false
     loadCanFoods()
   } catch (error) {
-    ElMessage.error(error.response?.data?.detail || '操作失败')
+    if (!error.config?._handled) ElMessage.error(error.response?.data?.detail || '操作失败')
   }
 }
 

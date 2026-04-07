@@ -112,7 +112,7 @@ const handleSubmit = async () => {
     dialogVisible.value = false
     loadUsers()
   } catch (error) {
-    ElMessage.error(error.response?.data?.detail || '操作失败')
+    if (!error.config?._handled) ElMessage.error(error.response?.data?.detail || '操作失败')
   }
 }
 

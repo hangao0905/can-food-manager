@@ -22,6 +22,9 @@ api.interceptors.response.use(
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
+      // 标记为已处理，阻止组件 catch 块显示错误
+      error.config._handled = true
+      return Promise.reject(error)
     }
     return Promise.reject(error)
   }

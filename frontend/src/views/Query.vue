@@ -152,11 +152,11 @@ const pagedResults = computed(() => {
 })
 
 const loadBrands = async () => {
-  try { const { data } = await brandApi.list(); brands.value = data } catch (e) { ElMessage.error('加载品牌失败') }
+  try { const { data } = await brandApi.list(); brands.value = data } catch (e) { if (!e.config?._handled) ElMessage.error('加载品牌失败') }
 }
 
 const loadFlavors = async () => {
-  try { const { data } = await flavorApi.list({ page_size: 500 }); flavors.value = data } catch (e) { ElMessage.error('加载口味失败') }
+  try { const { data } = await flavorApi.list({ page_size: 500 }); flavors.value = data } catch (e) { if (!e.config?._handled) ElMessage.error('加载口味失败') }
 }
 
 const loadAll = async () => {
