@@ -5,6 +5,7 @@ from typing import Optional
 
 from app.database import get_db
 from app.models.models import Brand as BrandModel
+from app.routers.auth import get_current_user
 
 router = APIRouter(prefix="/brands", tags=["品牌管理"])
 
@@ -20,19 +21,19 @@ class BrandUpdate(BaseModel):
         from_attributes = True
 
 @router.get("/")
-def list_brands(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_brands(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     brands = db.query(BrandModel).offset(skip).limit(limit).all()
     return [{"code": b.code, "name": b.name, "alias": b.alias, "logo": b.logo, "description": b.description, "country": b.country, "created_date": b.created_date} for b in brands]
 
 @router.get("/{brand_code}")
-def get_brand(brand_code: int, db: Session = Depends(get_db)):
+def get_brand(brand_code: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     brand = db.query(BrandModel).filter(BrandModel.code == brand_code).first()
     if not brand:
         raise HTTPException(status_code=404, detail="品牌不存在")
     return {"code": brand.code, "name": brand.name, "alias": brand.alias, "logo": brand.logo, "description": brand.description, "country": brand.country, "created_date": brand.created_date}
 
 @router.post("/")
-def create_brand(data: BrandUpdate, db: Session = Depends(get_db)):
+def create_brand(data: BrandUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     max_code = db.query(BrandModel.code).order_by(BrandModel.code.desc()).first()
     new_code = (max_code[0] + 1) if max_code else 1
     brand = BrandModel(code=new_code, name=data.name, alias=data.alias, logo=data.logo, description=data.description, country=data.country or '国内', created_date=data.created_date)
@@ -42,7 +43,7 @@ def create_brand(data: BrandUpdate, db: Session = Depends(get_db)):
     return {"code": brand.code, "name": brand.name, "alias": brand.alias, "logo": brand.logo, "description": brand.description, "country": brand.country, "created_date": brand.created_date}
 
 @router.put("/{brand_code}")
-def update_brand(brand_code: int, data: BrandUpdate, db: Session = Depends(get_db)):
+def update_brand(brand_code: int, data: BrandUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     brand = db.query(BrandModel).filter(BrandModel.code == brand_code).first()
     if not brand:
         raise HTTPException(status_code=404, detail="品牌不存在")
@@ -57,7 +58,7 @@ def update_brand(brand_code: int, data: BrandUpdate, db: Session = Depends(get_d
     return {"code": brand.code, "name": brand.name, "alias": brand.alias, "logo": brand.logo, "description": brand.description, "country": brand.country, "created_date": brand.created_date}
 
 @router.delete("/{brand_code}")
-def delete_brand(brand_code: int, db: Session = Depends(get_db)):
+def delete_brand(brand_code: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     brand = db.query(BrandModel).filter(BrandModel.code == brand_code).first()
     if not brand:
         raise HTTPException(status_code=404, detail="品牌不存在")

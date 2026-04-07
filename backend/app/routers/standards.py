@@ -5,6 +5,7 @@ from typing import Optional, List
 
 from app.database import get_db
 from app.models.models import Standard
+from app.routers.auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/standards", tags=["计算标准"])
 
@@ -22,11 +23,11 @@ class StandardUpdate(BaseModel):
         from_attributes = True
 
 @router.get("/")
-def list_standards(db: Session = Depends(get_db)):
+def list_standards(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     return db.query(Standard).order_by(Standard.id).all()
 
 @router.put("/{id}")
-def update_standard(id: int, data: StandardUpdate, db: Session = Depends(get_db)):
+def update_standard(id: int, data: StandardUpdate, db: Session = Depends(get_db), current_user: dict = Depends(require_admin)):
     s = db.query(Standard).filter(Standard.id == id).first()
     if not s:
         raise HTTPException(status_code=404, detail="标准不存在")
@@ -51,7 +52,7 @@ DEFAULT_STANDARDS = [
 ]
 
 @router.post("/init")
-def init_defaults(db: Session = Depends(get_db)):
+def init_defaults(db: Session = Depends(get_db), current_user: dict = Depends(require_admin)):
     """初始化默认标准（已存在则跳过）"""
     existing = db.query(Standard).count()
     if existing > 0:

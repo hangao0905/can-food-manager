@@ -5,6 +5,7 @@ from typing import Optional
 
 from app.database import get_db
 from app.models.models import CanFood as CanFoodModel, Standard as StandardModel
+from app.routers.auth import get_current_user
 
 router = APIRouter(prefix="/can-foods", tags=["罐头管理"])
 
@@ -219,20 +220,20 @@ def to_dict(c):
 
 
 @router.get("/")
-def list_can_foods(page: int = 1, page_size: int = 50, db: Session = Depends(get_db)):
+def list_can_foods(page: int = 1, page_size: int = 50, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     query = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor))
     skip = (page - 1) * page_size
     return [to_dict(c) for c in query.offset(skip).limit(page_size).all()]
 
 @router.get("/{code}")
-def get_can_food(code: int, db: Session = Depends(get_db)):
+def get_can_food(code: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     c = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor)).filter(CanFoodModel.code == code).first()
     if not c:
         return {"error": "not found"}
     return to_dict(c)
 
 @router.put("/{code}")
-def update_can_food(code: int, data: CanFoodUpdate, db: Session = Depends(get_db)):
+def update_can_food(code: int, data: CanFoodUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     c = db.query(CanFoodModel).filter(CanFoodModel.code == code).first()
     if not c:
         raise HTTPException(status_code=404, detail="罐头不存在")
@@ -259,7 +260,7 @@ def update_can_food(code: int, data: CanFoodUpdate, db: Session = Depends(get_db
     return to_dict(c)
 
 @router.post("/{code}/recalc")
-def recalc_can_food(code: int, db: Session = Depends(get_db)):
+def recalc_can_food(code: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     """重新计算某条罐头的所有派生字段（干物质、代谢能、合格指标等）"""
     c = db.query(CanFoodModel).filter(CanFoodModel.code == code).first()
     if not c:
@@ -284,7 +285,7 @@ def recalc_can_food(code: int, db: Session = Depends(get_db)):
     return to_dict(c)
 
 @router.post("/recalc-all")
-def recalc_all(db: Session = Depends(get_db)):
+def recalc_all(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     """重新计算所有罐头的派生字段"""
     count = 0
     for c in db.query(CanFoodModel).all():
@@ -308,7 +309,7 @@ def recalc_all(db: Session = Depends(get_db)):
     return {"message": f"已重新计算 {count} 条记录"}
 
 @router.delete("/{code}")
-def delete_can_food(code: int, db: Session = Depends(get_db)):
+def delete_can_food(code: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     c = db.query(CanFoodModel).filter(CanFoodModel.code == code).first()
     if not c:
         raise HTTPException(status_code=404, detail="罐头不存在")
