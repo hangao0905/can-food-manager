@@ -44,6 +44,9 @@
         <el-table-column prop="alias" label="通俗名" min-width="120">
           <template #default="{ row }">{{ row.alias || '-' }}</template>
         </el-table-column>
+        <el-table-column prop="description" label="简介" show-overflow-tooltip min-width="160">
+          <template #default="{ row }">{{ row.description || '-' }}</template>
+        </el-table-column>
         <el-table-column prop="country" label="国家" width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="row.country === '国内' ? 'success' : 'warning'" size="small">{{ row.country }}</el-tag>
@@ -84,6 +87,9 @@
             <el-option value="国外" label="国外" />
           </el-select>
         </el-form-item>
+        <el-form-item label="简介">
+          <el-input v-model="form.description" type="textarea" rows="2" placeholder="品牌简介" />
+        </el-form-item>
         <el-form-item label="Logo">
           <div class="logo-upload">
             <el-image
@@ -119,7 +125,7 @@ const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
 const logoInput = ref(null)
-const form = ref({ name: '', alias: '', logo: '', country: '国内' })
+const form = ref({ name: '', alias: '', logo: '', description: '', country: '国内' })
 const filterForm = ref({ name: '', alias: '', country: '' })
 const pagination = ref({ page: 1, pageSize: 20 })
 
@@ -167,9 +173,9 @@ const handleLogoUpload = (e) => {
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { code: row.code, name: row.name, alias: row.alias || '', logo: row.logo || '', country: row.country || '国内' }
+    form.value = { code: row.code, name: row.name, alias: row.alias || '', logo: row.logo || '', description: row.description || '', country: row.country || '国内' }
   } else {
-    form.value = { name: '', alias: '', logo: '', country: '国内' }
+    form.value = { name: '', alias: '', logo: '', description: '', country: '国内' }
   }
   dialogVisible.value = true
 }
