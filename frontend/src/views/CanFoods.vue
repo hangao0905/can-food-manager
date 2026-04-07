@@ -36,23 +36,51 @@
     <!-- 下部：数据明细 -->
     <el-card class="table-card">
       <el-table :data="pagedData" stripe v-loading="loading">
-        <el-table-column prop="code" label="ID" width="100" />
-        <el-table-column prop="brand.name" label="品牌" width="120" />
-        <el-table-column prop="flavor.name" label="口味" width="100" />
-        <el-table-column prop="description" label="简介" show-overflow-tooltip min-width="200" />
-        <el-table-column label="蛋白%" width="80" align="center">
+        <el-table-column prop="code" label="ID" width="70" />
+        <el-table-column prop="brand.name" label="品牌" width="90" />
+        <el-table-column prop="flavor.name" label="口味" width="90" />
+        <el-table-column prop="description" label="简介" width="120" show-overflow-tooltip />
+        <el-table-column prop="total_energy_kcal" label="热量" width="80" sortable>
+          <template #default="{ row }">{{ row.total_energy_kcal ? Math.round(row.total_energy_kcal)+'kcal/kg' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="蛋白%" width="70" sortable align="center">
           <template #default="{ row }">{{ row.protein != null ? (row.protein*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="脂肪%" width="80" align="center">
+        <el-table-column label="脂肪%" width="70" sortable align="center">
           <template #default="{ row }">{{ row.fat != null ? (row.fat*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="protein_pass" label="蛋白合格" width="90" align="center">
+        <el-table-column label="灰分%" width="70" sortable align="center">
+          <template #default="{ row }">{{ row.ash != null ? (row.ash*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="纤维%" width="70" sortable align="center">
+          <template #default="{ row }">{{ row.fiber != null ? (row.fiber*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="水分%" width="70" sortable align="center">
+          <template #default="{ row }">{{ row.moisture != null ? (row.moisture*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="钙%" width="75" sortable align="center">
+          <template #default="{ row }">{{ row.calcium_wet != null ? (row.calcium_wet*100).toFixed(3)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="磷%" width="75" sortable align="center">
+          <template #default="{ row }">{{ row.phosphorus_wet != null ? (row.phosphorus_wet*100).toFixed(3)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="protein_pass" label="蛋白合格" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.protein_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.protein_pass || '-' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="creator" label="创建人" width="90" />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column prop="fat_pass" label="脂肪合格" width="80" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.fat_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.fat_pass || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="ca_ph_pass" label="钙磷比合格" width="90" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.ca_ph_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.ca_ph_pass || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="creator" label="创建人" width="80" />
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
             <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
