@@ -185,7 +185,7 @@
     </el-card>
 
     <!-- 新增/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="900px" @closed="resetForm">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="1100px" @closed="resetForm">
       <el-form :model="form" label-width="110px">
         <el-row :gutter="16">
           <el-col :span="8">
@@ -212,27 +212,61 @@
           <el-input v-model="form.description" type="textarea" rows="2" />
         </el-form-item>
 
-        <el-divider content-position="left">营养成分（湿基）</el-divider>
+        <el-divider content-position="left">营养成分（湿基）- 可编辑</el-divider>
         <el-row :gutter="12">
-          <el-col :span="8"><el-form-item label="蛋白质含量"><el-input-number v-model="form.protein" :min="0" :precision="4" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="脂肪含量"><el-input-number v-model="form.fat" :min="0" :precision="4" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="粗灰分含量"><el-input-number v-model="form.ash" :min="0" :precision="4" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="粗纤维含量"><el-input-number v-model="form.fiber" :min="0" :precision="4" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="水分含量"><el-input-number v-model="form.moisture" :min="0" :precision="4" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="粗NFE(碳水)"><el-input-number v-model="form.nfe_wet" :min="0" :precision="4" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="钙含量-湿基"><el-input-number v-model="form.calcium_wet" :min="0" :precision="4" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="磷含量-湿基"><el-input-number v-model="form.phosphorus_wet" :min="0" :precision="4" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="蛋白质"><el-input-number v-model="form.protein" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="脂肪"><el-input-number v-model="form.fat" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="粗灰分"><el-input-number v-model="form.ash" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="粗纤维"><el-input-number v-model="form.fiber" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="水分"><el-input-number v-model="form.moisture" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="钙-湿基"><el-input-number v-model="form.calcium_wet" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="磷-湿基"><el-input-number v-model="form.phosphorus_wet" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="NFE-湿基"><el-input-number v-model="form.nfe_wet" :min="0" :precision="4" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="标注kcal"><el-input-number v-model="form.labeled_kcal" :min="0" :precision="2" style="width:100%" /></el-form-item></el-col>
+        </el-row>
+
+        <el-divider content-position="left">罐头图片</el-divider>
+        <el-form-item label="">
+          <div style="display:flex;align-items:center;gap:12px">
+            <el-image v-if="form.photo" :src="form.photo" fit="cover" style="width:80px;height:80px;border-radius:8px;border:1px solid #dcdfe6" :preview-src-list="[form.photo]" />
+            <div v-else style="width:80px;height:80px;border:1px dashed #dcdfe6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#909399;font-size:12px;cursor:pointer" @click="photoInput.click()">点击上传</div>
+            <div v-if="form.photo"><el-button size="small" type="danger" @click="form.photo=''">移除</el-button></div>
+          </div>
+          <input ref="photoInput" type="file" accept="image/*" style="display:none" @change="e=>handlePhotoUpload(e,'photo')" />
+        </el-form-item>
+
+        <el-divider content-position="left">自动计算值</el-divider>
+        <el-row :gutter="12">
+          <el-col :span="6"><el-form-item label="钙磷比"><el-input :model-value="form.ca_ph_ratio != null ? form.ca_ph_ratio.toFixed(4) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="蛋白-干基"><el-input :model-value="form.protein_dm != null ? (form.protein_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="脂肪-干基"><el-input :model-value="form.fat_dm != null ? (form.fat_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="灰分-干基"><el-input :model-value="form.ash_dm != null ? (form.ash_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="NFE-干基"><el-input :model-value="form.nfe_dm != null ? (form.nfe_dm*100).toFixed(2)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="钙-干基"><el-input :model-value="form.calcium_dm != null ? (form.calcium_dm*100).toFixed(3)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="磷-干基"><el-input :model-value="form.phosphorus_dm != null ? (form.phosphorus_dm*100).toFixed(3)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="钙mg/1000kal"><el-input :model-value="form.calcium_per_1000kal != null ? form.calcium_per_1000kal.toFixed(1) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="磷mg/1000kal"><el-input :model-value="form.phosphorus_per_1000kal != null ? form.phosphorus_per_1000kal.toFixed(1) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="磷水平"><el-input :model-value="form.phosphorus_level || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="1kg总热量"><el-input :model-value="form.total_energy_kcal != null ? Math.round(form.total_energy_kcal)+'kcal/kg' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="标注kcal"><el-input :model-value="form.labeled_kcal != null ? form.labeled_kcal : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="蛋白kcal"><el-input :model-value="form.protein_kcal != null ? Math.round(form.protein_kcal) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="脂肪kcal"><el-input :model-value="form.fat_kcal != null ? Math.round(form.fat_kcal) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="碳水kcal"><el-input :model-value="form.carb_kcal != null ? Math.round(form.carb_kcal) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="蛋白代谢能%"><el-input :model-value="form.protein_met_energy_pct != null ? (form.protein_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="脂肪代谢能%"><el-input :model-value="form.fat_met_energy_pct != null ? (form.fat_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="碳水代谢能%"><el-input :model-value="form.carb_met_energy_pct != null ? (form.carb_met_energy_pct*100).toFixed(1)+'%' : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="蛋白:脂肪"><el-input :model-value="form.protein_fat_ratio != null ? form.protein_fat_ratio.toFixed(2) : '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="蛋白水平"><el-input :model-value="form.protein_level || '-'" disabled /></el-form-item></el-col>
         </el-row>
 
         <el-divider content-position="left">合格指标</el-divider>
         <el-row :gutter="12">
-          <el-col :span="8"><el-form-item label="粗蛋白合格"><el-input v-model="form.protein_pass" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="粗脂肪合格"><el-input v-model="form.fat_pass" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="粗纤维合格"><el-input v-model="form.fiber_pass" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="粗灰分合格"><el-input v-model="form.ash_pass" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="含水量合格"><el-input v-model="form.moisture_pass" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="钙磷合格"><el-input v-model="form.ca_ph_pass" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="蛋白质含量合格"><el-input v-model="form.protein_level" /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="蛋白合格"><el-input :model-value="form.protein_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="脂肪合格"><el-input :model-value="form.fat_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="纤维合格"><el-input :model-value="form.fiber_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="灰分合格"><el-input :model-value="form.ash_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="水分合格"><el-input :model-value="form.moisture_pass || '-'" disabled /></el-form-item></el-col>
+          <el-col :span="6"><el-form-item label="钙磷合格"><el-input :model-value="form.ca_ph_pass || '-'" disabled /></el-form-item></el-col>
         </el-row>
       </el-form>
       <template #footer>
@@ -264,8 +298,8 @@ function getDefaultForm() {
     brand_code: '', flavor_code: '', description: '', creator: '',
     protein: null, fat: null, ash: null, fiber: null, moisture: null,
     calcium_wet: null, phosphorus_wet: null, nfe_wet: null,
-    protein_pass: '', fat_pass: '', fiber_pass: '', ash_pass: '',
-    moisture_pass: '', ca_ph_pass: '', protein_level: '',
+    photo: '',
+    labeled_kcal: null,
   }
 }
 
@@ -281,6 +315,16 @@ const onBrandFilterChange = () => { filterForm.value.flavor_code = '' }
 const onBrandChange = () => {
   form.value.flavor_code = ''
   dialogFlavors.value = flavors.value.filter(f => f.brand_code === form.value.brand_code)
+}
+
+const photoInput = ref(null)
+const handlePhotoUpload = (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  if (file.size > 5 * 1024 * 1024) { ElMessage.warning('图片不超过5MB'); return }
+  const reader = new FileReader()
+  reader.onload = (ev) => { form.value.photo = ev.target.result }
+  reader.readAsDataURL(file)
 }
 
 const filteredData = computed(() => {
@@ -326,12 +370,23 @@ const showDialog = (type, row = null) => {
   dialogType.value = type
   dialogFlavors.value = type === 'edit' && row ? flavors.value.filter(f => f.brand_code === row.brand_code) : []
   if (type === 'edit' && row) {
-    const f = { code: row.code }
-    const fields = ['brand_code','flavor_code','description','creator','protein','fat','ash','fiber','moisture',
-      'calcium_wet','phosphorus_wet','nfe_wet','protein_pass','fat_pass','fiber_pass','ash_pass',
-      'moisture_pass','ca_ph_pass','protein_level']
-    fields.forEach(k => f[k] = row[k] ?? null)
-    form.value = f
+    form.value = {
+      code: row.code,
+      brand_code: row.brand_code ?? '',
+      flavor_code: row.flavor_code ?? '',
+      description: row.description ?? '',
+      creator: row.creator ?? '',
+      protein: row.protein ?? null,
+      fat: row.fat ?? null,
+      ash: row.ash ?? null,
+      fiber: row.fiber ?? null,
+      moisture: row.moisture ?? null,
+      calcium_wet: row.calcium_wet ?? null,
+      phosphorus_wet: row.phosphorus_wet ?? null,
+      nfe_wet: row.nfe_wet ?? null,
+      photo: row.photo ?? '',
+      labeled_kcal: row.labeled_kcal ?? null,
+    }
   } else {
     form.value = getDefaultForm()
   }
@@ -342,11 +397,28 @@ const resetForm = () => { form.value = getDefaultForm() }
 
 const handleSubmit = async () => {
   try {
+    // 只发送可编辑字段，避免覆盖后端计算值
+    const payload = {
+      brand_code: form.value.brand_code || null,
+      flavor_code: form.value.flavor_code || null,
+      description: form.value.description || null,
+      creator: form.value.creator || null,
+      protein: form.value.protein,
+      fat: form.value.fat,
+      ash: form.value.ash,
+      fiber: form.value.fiber,
+      moisture: form.value.moisture,
+      calcium_wet: form.value.calcium_wet,
+      phosphorus_wet: form.value.phosphorus_wet,
+      nfe_wet: form.value.nfe_wet,
+      labeled_kcal: form.value.labeled_kcal,
+      photo: form.value.photo || null,
+    }
     if (dialogType.value === 'create') {
-      await canFoodApi.create(form.value)
+      await canFoodApi.create(payload)
       ElMessage.success('创建成功')
     } else {
-      await canFoodApi.update(form.value.code, form.value)
+      await canFoodApi.update(form.value.code, payload)
       ElMessage.success('更新成功')
     }
     dialogVisible.value = false
