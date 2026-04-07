@@ -62,7 +62,7 @@ def _apply_standard(value: float, operator: str, threshold: float, threshold_max
     if operator == '<=': return value <= threshold
     if operator == '>':  return value > threshold
     if operator == '<':  return value < threshold
-    if operator == 'range': return value > threshold and value < threshold_max
+    if operator == 'range': return value >= threshold and value <= threshold_max
     return False
 
 
@@ -177,7 +177,7 @@ def _calc_nutrients(data: dict, db=None) -> dict:
             data['moisture_pass'] = '合格' if moisture <= 0.8 else '不合格'
         if data.get('ca_ph_ratio') is not None:
             r = data['ca_ph_ratio']
-            data['ca_ph_pass'] = '合格' if (r > 1.1 and r < 1.4) else '不合格'
+            data['ca_ph_pass'] = '合格' if (r >= 1.1 and r <= 1.4) else '不合格'
         if data.get('protein_fat_ratio') is not None:
             r = data['protein_fat_ratio']
             if r > 3:     data['protein_level'] = '优秀'
