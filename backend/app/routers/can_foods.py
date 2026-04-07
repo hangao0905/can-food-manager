@@ -248,8 +248,9 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
         next_num = 1
     new_code = int(f"{today}{next_num:03d}")
 
-    nutrition_data = _calc_nutrients(data.dict(), db)
-    db_obj = CanFoodModel(code=new_code, creator=current_user['username'], **data.dict(), **nutrition_data)
+    nutrition_data = _calc_nutrients(data.dict(exclude_none=True), db)
+    input_data = {k: v for k, v in data.dict().items() if k not in ('creator', 'created_date')}
+    db_obj = CanFoodModel(code=new_code, creator=current_user['username'], **input_data, **nutrition_data)
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
