@@ -46,22 +46,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { Shop, Dish, Box, Search, Setting, User } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const isLoggedIn = ref(false)
-const isAdmin = ref(false)
-const username = ref('')
-
-onMounted(() => {
-  const token = localStorage.getItem('token')
-  const user = JSON.parse(localStorage.getItem('user') || '{}')
-  isLoggedIn.value = !!token
-  isAdmin.value = user.role === 'admin'
-  username.value = user.username || ''
-})
+const token = localStorage.getItem('token')
+const user = JSON.parse(localStorage.getItem('user') || '{}')
+const isLoggedIn = ref(!!token)
+const isAdmin = ref(user.role === 'admin')
+const username = ref(user.username || '')
 
 const logout = () => {
   localStorage.removeItem('token')
