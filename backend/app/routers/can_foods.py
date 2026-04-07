@@ -278,7 +278,7 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
     c = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor)).filter(CanFoodModel.code == new_code).first()
     return to_dict(c)
 
-
+@router.get("/", dependencies=[Depends(get_current_user)])
 def list_can_foods(page: int = 1, page_size: int = 50, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     query = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor))
     skip = (page - 1) * page_size
