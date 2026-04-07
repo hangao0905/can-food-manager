@@ -248,10 +248,9 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
         next_num = 1
     new_code = int(f"{today}{next_num:03d}")
 
-    nutrition_data = _calc_nutrients(data.dict(exclude_none=True), db)
-    # 分离湿基字段和计算字段，避免冲突
-    wet_fields = {'protein', 'fat', 'ash', 'fiber', 'moisture', 'calcium_wet', 'phosphorus_wet', 'nfe_wet', 'labeled_kcal'}
-    calc_fields = {k: v for k, v in nutrition_data.items() if k not in wet_fields}
+    # 计算派生营养字段（不对原始data做mutation）
+    dry = {k: v for k, v in data.dict(exclude_none=True).items()}
+    calc = _calc_nutrients(dry, db)
     db_obj = CanFoodModel(
         code=new_code,
         creator=current_user['username'],
@@ -268,7 +267,9 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
         nfe_wet=data.nfe_wet,
         labeled_kcal=data.labeled_kcal,
         photo=data.photo,
-        **calc_fields
+        **{k: v for k, v in calc.items()
+           if k not in ('protein','fat','ash','fiber','moisture',
+                        'calcium_wet','phosphorus_wet','nfe_wet','labeled_kcal')}
     )
     db.add(db_obj)
     db.commit()
