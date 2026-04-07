@@ -48,7 +48,7 @@ const handleLogin = async () => {
     localStorage.setItem('token', data.access_token)
     localStorage.setItem('user', JSON.stringify(data.user))
     ElMessage.success('登录成功')
-    router.push('/brands')
+    router.push('/dashboard')
   } catch (e) {
     error.value = e.response?.data?.detail || '登录失败'
   } finally {

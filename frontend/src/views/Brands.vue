@@ -11,6 +11,11 @@
       <el-table :data="brands" stripe v-loading="loading">
         <el-table-column prop="code" label="ID" width="80" />
         <el-table-column prop="name" label="品牌名称" />
+        <el-table-column prop="country" label="国家" width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.country === '国内' ? 'success' : 'warning'">{{ row.country }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="created_date" label="创建日期" width="160" />
         <el-table-column label="操作" width="180">
           <template #default="{ row }">
@@ -25,6 +30,12 @@
       <el-form :model="form" label-width="80px">
         <el-form-item label="品牌名称">
           <el-input v-model="form.name" />
+        </el-form-item>
+        <el-form-item label="国家">
+          <el-select v-model="form.country">
+            <el-option value="国内" label="国内" />
+            <el-option value="国外" label="国外" />
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -44,7 +55,7 @@ const brands = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
-const form = ref({ name: '' })
+const form = ref({ name: '', country: '国内' })
 
 const dialogTitle = computed(() => dialogType.value === 'create' ? '新增品牌' : '编辑品牌')
 
@@ -63,9 +74,9 @@ const loadBrands = async () => {
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { code: row.code, name: row.name }
+    form.value = { code: row.code, name: row.name, country: row.country || '国内' }
   } else {
-    form.value = { name: '' }
+    form.value = { name: '', country: '国内' }
   }
   dialogVisible.value = true
 }

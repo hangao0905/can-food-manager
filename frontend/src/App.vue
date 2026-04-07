@@ -9,6 +9,10 @@
         router
         class="app-menu"
       >
+        <el-menu-item index="/dashboard">
+          <el-icon><HomeFilled /></el-icon>
+          <span>首页概览</span>
+        </el-menu-item>
         <el-menu-item index="/brands">
           <el-icon><Shop /></el-icon>
           <span>品牌管理</span>
@@ -47,7 +51,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { Shop, Dish, Box, Search, Setting, User } from '@element-plus/icons-vue'
+import { HomeFilled, Shop, Dish, Box, Search, Setting, User } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

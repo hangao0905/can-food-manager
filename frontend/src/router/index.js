@@ -8,7 +8,11 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/brands'
+    redirect: '/dashboard'
+  },
+  {
+    path: '/dashboard',
+    component: () => import('../views/Dashboard.vue'),
   },
   {
     path: '/brands',
