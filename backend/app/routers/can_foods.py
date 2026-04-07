@@ -253,11 +253,14 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
     input_dict = copy.deepcopy(data.dict(exclude_none=True))
     calc = _calc_nutrients(input_dict, db)
     # 分离输入字段和计算字段
+    # 注意：brand_code/flavor_code/description/photo 也从data.dict()来，会出现在calc里，需排除
+    metadata_fields = {'brand_code', 'flavor_code', 'description', 'photo', 'creator', 'created_date'}
+    wet_fields = {'protein', 'fat', 'ash', 'fiber', 'moisture',
+                  'calcium_wet', 'phosphorus_wet', 'nfe_wet', 'labeled_kcal'}
     input_fields = {k: v for k, v in calc.items()
-                    if k in ('protein','fat','ash','fiber','moisture',
-                             'calcium_wet','phosphorus_wet','nfe_wet','labeled_kcal')}
+                    if k in wet_fields}
     calc_only = {k: v for k, v in calc.items()
-                 if k not in input_fields}
+                 if k not in metadata_fields and k not in wet_fields}
     db_obj = CanFoodModel(
         code=new_code,
         creator=current_user['username'],
