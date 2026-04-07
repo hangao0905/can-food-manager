@@ -27,6 +27,13 @@ export const canFoodApi = {
   create: (data) => api.post('/can-foods/', data),
   update: (id, data) => api.put(`/can-foods/${id}`, data),
   delete: (id) => api.delete(`/can-foods/${id}`),
+  recalcAll: () => api.post('/can-foods/recalc-all'),
+}
+
+export const standardApi = {
+  list: () => api.get('/standards/'),
+  update: (id, data) => api.put(`/standards/${id}`, data),
+  init: () => api.post('/standards/init'),
 }
 
 export default api

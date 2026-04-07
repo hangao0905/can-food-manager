@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
-from app.routers import brands, flavors, can_foods
+from app.routers import brands, flavors, can_foods, standards
 
 # 创建数据库表
 Base.metadata.create_all(bind=engine)
@@ -22,6 +22,7 @@ app.add_middleware(
 app.include_router(brands.router)
 app.include_router(flavors.router)
 app.include_router(can_foods.router)
+app.include_router(standards.router)
 
 
 @app.get("/")

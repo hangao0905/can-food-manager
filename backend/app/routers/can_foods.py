@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 from app.database import get_db
-from app.models.models import CanFood as CanFoodModel
+from app.models.models import CanFood as CanFoodModel, Standard as StandardModel
 
 router = APIRouter(prefix="/can-foods", tags=["罐头管理"])
 
@@ -54,7 +54,18 @@ class CanFoodUpdate(BaseModel):
         from_attributes = True
 
 
-def _calc_nutrients(data: dict) -> dict:
+def _apply_standard(value: float, operator: str, threshold: float, threshold_max: float = None) -> bool:
+    if value is None:
+        return False
+    if operator == '>=': return value >= threshold
+    if operator == '<=': return value <= threshold
+    if operator == '>':  return value > threshold
+    if operator == '<':  return value < threshold
+    if operator == 'range': return value > threshold and value < threshold_max
+    return False
+
+
+def _calc_nutrients(data: dict, db=None) -> dict:
     """根据输入的营养成分自动计算派生字段"""
     protein  = data.get('protein')
     fat     = data.get('fat')
@@ -124,24 +135,53 @@ def _calc_nutrients(data: dict) -> dict:
         data['protein_fat_ratio'] = None
 
     # 合格指标
-    if protein is not None:
-        data['protein_pass'] = '合格' if protein >= 0.1 else '不合格'
-    if fat is not None:
-        data['fat_pass'] = '合格' if fat <= 0.09 else '不合格'
-    if fiber is not None:
-        data['fiber_pass'] = '合格' if fiber <= 0.03 else '不合格'
-    if ash is not None:
-        data['ash_pass'] = '合格' if ash <= 0.02 else '不合格'
-    if moisture is not None:
-        data['moisture_pass'] = '合格' if moisture <= 0.8 else '不合格'
-    if data.get('ca_ph_ratio') is not None:
-        r = data['ca_ph_ratio']
-        data['ca_ph_pass'] = '合格' if (r > 1.1 and r < 1.4) else '不合格'
-    if data.get('protein_fat_ratio') is not None:
-        r = data['protein_fat_ratio']
-        if r > 3:     data['protein_level'] = '优秀'
-        elif r > 1.5: data['protein_level'] = '一般'
-        else:         data['protein_level'] = '不合格'
+    # 合格指标 - 从 DB standards 表读取规则
+    if db is not None:
+        standards = db.query(StandardModel).filter(StandardModel.status == 'active').all()
+        pass_fields = {
+            'protein': 'protein_pass', 'fat': 'fat_pass', 'fiber': 'fiber_pass',
+            'ash': 'ash_pass', 'moisture': 'moisture_pass', 'ca_ph_ratio': 'ca_ph_pass'
+        }
+        for s in standards:
+            val = data.get(s.field)
+            if val is None:
+                continue
+            ok = _apply_standard(val, s.operator, s.threshold, s.threshold_max)
+            if s.field in pass_fields:
+                data[pass_fields[s.field]] = '合格' if ok else '不合格'
+            # 磷含量指标
+            if s.name == '磷含量指标-高' and s.operator == '>' and s.threshold == 2400:
+                data['phosphorus_level'] = '高磷' if ok else None
+            if s.name == '磷含量指标-低' and s.operator == '<' and s.threshold == 1800:
+                data['phosphorus_level'] = '低磷' if ok else ('中磷' if data.get('phosphorus_per_1000kal') else None)
+            # 蛋白质水平
+            if s.name == '蛋白质:脂肪-优秀' and s.operator == '>' and s.threshold == 3.0:
+                if ok: data['protein_level'] = '优秀'
+            if s.name == '蛋白质:脂肪-一般' and s.operator == '>' and s.threshold == 1.5:
+                if ok and data.get('protein_level') != '优秀': data['protein_level'] = '一般'
+            if data.get('protein_fat_ratio') is not None and data.get('protein_level') is None:
+                r = data['protein_fat_ratio']
+                if r <= 1.5: data['protein_level'] = '不合格'
+    else:
+        # 回退：硬编码规则
+        if protein is not None:
+            data['protein_pass'] = '合格' if protein >= 0.1 else '不合格'
+        if fat is not None:
+            data['fat_pass'] = '合格' if fat <= 0.09 else '不合格'
+        if fiber is not None:
+            data['fiber_pass'] = '合格' if fiber <= 0.03 else '不合格'
+        if ash is not None:
+            data['ash_pass'] = '合格' if ash <= 0.02 else '不合格'
+        if moisture is not None:
+            data['moisture_pass'] = '合格' if moisture <= 0.8 else '不合格'
+        if data.get('ca_ph_ratio') is not None:
+            r = data['ca_ph_ratio']
+            data['ca_ph_pass'] = '合格' if (r > 1.1 and r < 1.4) else '不合格'
+        if data.get('protein_fat_ratio') is not None:
+            r = data['protein_fat_ratio']
+            if r > 3:     data['protein_level'] = '优秀'
+            elif r > 1.5: data['protein_level'] = '一般'
+            else:         data['protein_level'] = '不合格'
 
     return data
 
@@ -210,9 +250,7 @@ def update_can_food(code: int, data: CanFoodUpdate, db: Session = Depends(get_db
     if needs_recalc:
         raw = {f: getattr(c, f) for f in nutrition_keys}
         raw.update({k: getattr(c, k) for k in update_dict if k in nutrition_keys})
-        computed = _calc_nutrients({f: getattr(c, f) for f in [
-            'protein','fat','ash','fiber','moisture','calcium_wet','phosphorus_wet','nfe_wet'
-        ]})
+        computed = _calc_nutrients(raw, db=db)
         for k, v in computed.items():
             setattr(c, k, v)
 
@@ -231,7 +269,7 @@ def recalc_can_food(code: int, db: Session = Depends(get_db)):
         'moisture': c.moisture, 'calcium_wet': c.calcium_wet,
         'phosphorus_wet': c.phosphorus_wet, 'nfe_wet': c.nfe_wet
     }
-    computed = _calc_nutrients(raw)
+    computed = _calc_nutrients(raw, db=db)
     calc_fields = ['protein_dm','fat_dm','ash_dm','nfe_dm','calcium_dm','phosphorus_dm',
                    'ca_ph_ratio','calcium_per_1000kal','phosphorus_per_1000kal',
                    'phosphorus_level','total_energy_kcal','protein_kcal','fat_kcal',
@@ -255,7 +293,7 @@ def recalc_all(db: Session = Depends(get_db)):
             'moisture': c.moisture, 'calcium_wet': c.calcium_wet,
             'phosphorus_wet': c.phosphorus_wet, 'nfe_wet': c.nfe_wet
         }
-        computed = _calc_nutrients(raw)
+        computed = _calc_nutrients(raw, db=db)
         calc_fields = ['protein_dm','fat_dm','ash_dm','nfe_dm','calcium_dm','phosphorus_dm',
                        'ca_ph_ratio','calcium_per_1000kal','phosphorus_per_1000kal',
                        'phosphorus_level','total_energy_kcal','protein_kcal','fat_kcal',

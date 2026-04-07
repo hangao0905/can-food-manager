@@ -80,3 +80,17 @@ class CanFood(Base):
 
     brand = relationship("Brand")
     flavor = relationship("Flavor", back_populates="cans")
+
+
+class Standard(Base):
+    __tablename__ = "standards"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False)          # 如"粗蛋白合格"
+    field = Column(String(50), nullable=False)        # 如"protein"
+    operator = Column(String(10), nullable=False)       # >=, <=, >, <, range
+    threshold = Column(Float, nullable=True)            # 阈值
+    threshold_max = Column(Float, nullable=True)       # range 时的高阈值
+    unit = Column(String(20), nullable=True)           # 单位
+    status = Column(String(20), default='active')     # active / inactive
+    created_date = Column(Text, nullable=True)
