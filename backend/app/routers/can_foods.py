@@ -56,6 +56,22 @@ class CanFoodUpdate(BaseModel):
         from_attributes = True
 
 
+class CanFoodCreate(BaseModel):
+    brand_code: int
+    flavor_code: Optional[int] = None
+    description: Optional[str] = None
+    protein: Optional[float] = None
+    fat: Optional[float] = None
+    ash: Optional[float] = None
+    fiber: Optional[float] = None
+    moisture: Optional[float] = None
+    calcium_wet: Optional[float] = None
+    phosphorus_wet: Optional[float] = None
+    nfe_wet: Optional[float] = None
+    labeled_kcal: Optional[float] = None
+    photo: Optional[str] = None
+
+
 def _apply_standard(value: float, operator: str, threshold: float, threshold_max: float = None) -> bool:
     if value is None:
         return False
@@ -238,6 +254,39 @@ def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_
     db.commit()
     db.refresh(db_obj)
     # 重新查询以获取关联的 brand 和 flavor
+    c = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor)).filter(CanFoodModel.code == new_code).first()
+    return to_dict(c)
+
+
+@router.post("/", dependencies=[Depends(get_current_user)])
+def create_can_food(data: CanFoodCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    today = datetime.date.today().strftime('%Y%m%d')
+    prefix = f"{today}%"
+    last = db.query(CanFoodModel).filter(CanFoodModel.code.like(prefix)).order_by(CanFoodModel.code.desc()).first()
+    next_num = int(str(last.code)[-3:]) + 1 if last else 1
+    new_code = int(f"{today}{next_num:03d}")
+    nutrition_data = _calc_nutrients(data.dict(exclude_none=True), db)
+    db_obj = CanFoodModel(
+        code=new_code,
+        creator=current_user['username'],
+        brand_code=data.brand_code,
+        flavor_code=data.flavor_code,
+        description=data.description,
+        protein=data.protein,
+        fat=data.fat,
+        ash=data.ash,
+        fiber=data.fiber,
+        moisture=data.moisture,
+        calcium_wet=data.calcium_wet,
+        phosphorus_wet=data.phosphorus_wet,
+        nfe_wet=data.nfe_wet,
+        labeled_kcal=data.labeled_kcal,
+        photo=data.photo,
+        **nutrition_data
+    )
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
     c = db.query(CanFoodModel).options(joinedload(CanFoodModel.brand), joinedload(CanFoodModel.flavor)).filter(CanFoodModel.code == new_code).first()
     return to_dict(c)
 
