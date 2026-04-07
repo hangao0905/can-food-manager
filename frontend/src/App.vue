@@ -22,6 +22,10 @@
             <el-icon><Search /></el-icon>
             <span>组合查询</span>
           </el-menu-item>
+          <el-menu-item index="/standards">
+            <el-icon><Setting /></el-icon>
+            <span>计算标准</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-main class="app-main">
@@ -32,7 +36,7 @@
 </template>
 
 <script setup>
-import { Shop, Dish, Box, Search } from '@element-plus/icons-vue'
+import { Shop, Dish, Box, Search, Setting } from '@element-plus/icons-vue'
 </script>
 
 <style>
