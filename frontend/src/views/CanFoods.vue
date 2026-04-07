@@ -33,53 +33,136 @@
       </el-form>
     </el-card>
 
-    <!-- 下部：数据明细 -->
-    <el-card class="table-card">
-      <el-table :data="pagedData" stripe v-loading="loading">
-        <el-table-column prop="code" label="ID" width="70" />
-        <el-table-column prop="brand.name" label="品牌" width="90" />
-        <el-table-column prop="flavor.name" label="口味" width="90" />
-        <el-table-column prop="description" label="简介" width="120" show-overflow-tooltip />
-        <el-table-column prop="total_energy_kcal" label="热量" width="80" sortable>
+    <!-- 下部：数据明细（横向滚动） -->
+    <el-card class="table-card" body-style="overflow-x: auto;">
+      <el-table :data="pagedData" stripe v-loading="loading" style="min-width: 2000px">
+        <!-- 固定列 -->
+        <el-table-column prop="code" label="ID" width="70" fixed />
+        <el-table-column prop="brand.name" label="品牌" width="100" fixed />
+        <el-table-column prop="flavor.name" label="口味" width="100" fixed />
+        <el-table-column prop="description" label="简介" width="120" show-overflow-tooltip fixed />
+        <!-- 营养成分（湿基）-->
+        <el-table-column label="总热量" width="90" sortable>
           <template #default="{ row }">{{ row.total_energy_kcal ? Math.round(row.total_energy_kcal)+'kcal/kg' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="蛋白%" width="70" sortable align="center">
+        <el-table-column label="蛋白%·湿" width="80" sortable align="center">
           <template #default="{ row }">{{ row.protein != null ? (row.protein*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="脂肪%" width="70" sortable align="center">
+        <el-table-column label="脂肪%·湿" width="80" sortable align="center">
           <template #default="{ row }">{{ row.fat != null ? (row.fat*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="灰分%" width="70" sortable align="center">
+        <el-table-column label="粗灰分%·湿" width="85" sortable align="center">
           <template #default="{ row }">{{ row.ash != null ? (row.ash*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="纤维%" width="70" sortable align="center">
+        <el-table-column label="粗纤维%·湿" width="85" sortable align="center">
           <template #default="{ row }">{{ row.fiber != null ? (row.fiber*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="水分%" width="70" sortable align="center">
+        <el-table-column label="水分%·湿" width="80" sortable align="center">
           <template #default="{ row }">{{ row.moisture != null ? (row.moisture*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="钙%" width="75" sortable align="center">
+        <el-table-column label="钙%·湿" width="80" sortable align="center">
           <template #default="{ row }">{{ row.calcium_wet != null ? (row.calcium_wet*100).toFixed(3)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column label="磷%" width="75" sortable align="center">
+        <el-table-column label="磷%·湿" width="80" sortable align="center">
           <template #default="{ row }">{{ row.phosphorus_wet != null ? (row.phosphorus_wet*100).toFixed(3)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="protein_pass" label="蛋白合格" width="80" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.protein_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.protein_pass || '-' }}</el-tag>
-          </template>
+        <el-table-column label="NFE%·湿" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.nfe_wet != null ? (row.nfe_wet*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="fat_pass" label="脂肪合格" width="80" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.fat_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.fat_pass || '-' }}</el-tag>
-          </template>
+        <!-- 干物质 -->
+        <el-table-column label="蛋白%·干" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.protein_dm != null ? (row.protein_dm*100).toFixed(1)+'%' : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="ca_ph_pass" label="钙磷比合格" width="90" align="center">
+        <el-table-column label="脂肪%·干" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.fat_dm != null ? (row.fat_dm*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="灰分%·干" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.ash_dm != null ? (row.ash_dm*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="NFE%·干" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.nfe_dm != null ? (row.nfe_dm*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="钙%·干" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.calcium_dm != null ? (row.calcium_dm*100).toFixed(3)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="磷%·干" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.phosphorus_dm != null ? (row.phosphorus_dm*100).toFixed(3)+'%' : '-' }}</template>
+        </el-table-column>
+        <!-- 钙磷比 -->
+        <el-table-column label="钙磷比" width="80" sortable align="center">
+          <template #default="{ row }">{{ row.ca_ph_ratio != null ? row.ca_ph_ratio.toFixed(2) : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="ca_ph_pass" label="钙磷合格" width="85" align="center">
           <template #default="{ row }">
             <el-tag :type="row.ca_ph_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.ca_ph_pass || '-' }}</el-tag>
           </template>
         </el-table-column>
+        <!-- 每1000kcal -->
+        <el-table-column label="钙mg/1000kal" width="110" sortable align="center">
+          <template #default="{ row }">{{ row.calcium_per_1000kal != null ? row.calcium_per_1000kal.toFixed(0) : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="磷mg/1000kal" width="110" sortable align="center">
+          <template #default="{ row }">{{ row.phosphorus_per_1000kal != null ? row.phosphorus_per_1000kal.toFixed(0) : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="phosphorus_level" label="磷水平" width="80" align="center">
+          <template #default="{ row }">{{ row.phosphorus_level || '-' }}</template>
+        </el-table-column>
+        <!-- 代谢能 -->
+        <el-table-column label="蛋白代谢能%" width="105" sortable align="center">
+          <template #default="{ row }">{{ row.protein_met_energy_pct != null ? (row.protein_met_energy_pct*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="脂肪代谢能%" width="105" sortable align="center">
+          <template #default="{ row }">{{ row.fat_met_energy_pct != null ? (row.fat_met_energy_pct*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="碳水代谢能%" width="105" sortable align="center">
+          <template #default="{ row }">{{ row.carb_met_energy_pct != null ? (row.carb_met_energy_pct*100).toFixed(1)+'%' : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="蛋白kcal" width="85" sortable align="center">
+          <template #default="{ row }">{{ row.protein_kcal != null ? Math.round(row.protein_kcal) : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="脂肪kcal" width="85" sortable align="center">
+          <template #default="{ row }">{{ row.fat_kcal != null ? Math.round(row.fat_kcal) : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="碳水kcal" width="85" sortable align="center">
+          <template #default="{ row }">{{ row.carb_kcal != null ? Math.round(row.carb_kcal) : '-' }}</template>
+        </el-table-column>
+        <!-- 蛋白:脂肪比 -->
+        <el-table-column label="蛋白:脂肪" width="85" sortable align="center">
+          <template #default="{ row }">{{ row.protein_fat_ratio != null ? row.protein_fat_ratio.toFixed(2) : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="protein_level" label="蛋白水平" width="80" align="center">
+          <template #default="{ row }">{{ row.protein_level || '-' }}</template>
+        </el-table-column>
+        <!-- 合格指标 -->
+        <el-table-column prop="protein_pass" label="蛋白合格" width="85" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.protein_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.protein_pass || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="fat_pass" label="脂肪合格" width="85" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.fat_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.fat_pass || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="fiber_pass" label="纤维合格" width="85" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.fiber_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.fiber_pass || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="ash_pass" label="灰分合格" width="85" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.ash_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.ash_pass || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="moisture_pass" label="水分合格" width="85" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.moisture_pass === '合格' ? 'success' : 'danger'" size="small">{{ row.moisture_pass || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <!-- 创建信息 -->
         <el-table-column prop="creator" label="创建人" width="80" />
+        <el-table-column prop="created_date" label="创建日期" width="160" />
+        <!-- 操作 -->
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
@@ -191,9 +274,7 @@ const filterFlavors = computed(() => {
   return flavors.value.filter(f => f.brand_code === filterForm.value.brand_code)
 })
 
-const onBrandFilterChange = () => {
-  filterForm.value.flavor_code = ''
-}
+const onBrandFilterChange = () => { filterForm.value.flavor_code = '' }
 
 const onBrandChange = () => {
   form.value.flavor_code = ''
@@ -204,8 +285,8 @@ const filteredData = computed(() => {
   return canFoods.value.filter(c => {
     if (filterForm.value.brand_code && c.brand_code !== filterForm.value.brand_code) return false
     if (filterForm.value.flavor_code && c.flavor_code !== filterForm.value.flavor_code) return false
-    if (filterForm.value.protein_pass && c.protein_pass !== filterForm.value.protein_pass) return false
     if (filterForm.value.keyword && !c.description?.includes(filterForm.value.keyword)) return false
+    if (filterForm.value.protein_pass && c.protein_pass !== filterForm.value.protein_pass) return false
     if (filterForm.value.creator && !c.creator?.includes(filterForm.value.creator)) return false
     return true
   })
@@ -289,7 +370,6 @@ onMounted(() => { loadCanFoods(); loadBrands(); loadFlavors() })
 
 <style scoped>
 .page-container { display: flex; flex-direction: column; gap: 16px; height: 100%; }
-.filter-card { }
 .table-card { flex: 1; }
 .pagination { margin-top: 16px; display: flex; justify-content: flex-end; }
 </style>
