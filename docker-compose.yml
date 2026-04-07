@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: can-food-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - can-food-network
+
+  frontend:
+    build: ./frontend
+    container_name: can-food-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - can-food-network
+
+networks:
+  can-food-network:
+    driver: bridge
