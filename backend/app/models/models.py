@@ -8,6 +8,8 @@ class Brand(Base):
 
     code = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, nullable=False)
+    alias = Column(String(100), nullable=True)    # 通俗名
+    logo = Column(Text, nullable=True)           # logo图片base64
     country = Column(String(20), default='国内')  # 国内 / 国外
     created_date = Column(Text, nullable=True)
 

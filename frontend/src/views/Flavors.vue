@@ -11,9 +11,6 @@
             <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
           </el-select>
         </el-form-item>
-        <el-form-item label="创建人">
-          <el-input v-model="filterForm.creator" placeholder="模糊搜索" clearable />
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -25,8 +22,21 @@
     <!-- 下部：数据明细 -->
     <el-card class="table-card">
       <el-table :data="pagedData" stripe v-loading="loading">
-        <el-table-column prop="code" label="ID" width="80" />
-        <el-table-column prop="name" label="口味名称" />
+        <el-table-column label="缩略图" width="80" align="center">
+          <template #default="{ row }">
+            <el-image
+              v-if="row.photo"
+              :src="row.photo"
+              fit="cover"
+              style="width: 48px; height: 48px; cursor: pointer; border-radius: 6px;"
+              :preview-src-list="[row.photo]"
+              :initial-index="0"
+            />
+            <span v-else style="color: #c0c4cc; font-size: 12px;">无图</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="code" label="ID" width="70" />
+        <el-table-column prop="name" label="口味名称" min-width="120" />
         <el-table-column prop="brand.name" label="所属品牌" width="120" />
         <el-table-column prop="creator" label="创建人" width="100" />
         <el-table-column prop="created_date" label="创建日期" width="160" />
@@ -50,18 +60,35 @@
     </el-card>
 
     <!-- 新增/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
-      <el-form :model="form" label-width="80px">
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="560px">
+      <el-form :model="form" label-width="90px">
         <el-form-item label="口味名称">
-          <el-input v-model="form.name" />
+          <el-input v-model="form.name" placeholder="如 鸡肉口味" />
         </el-form-item>
         <el-form-item label="所属品牌">
-          <el-select v-model="form.brand_code" placeholder="请选择品牌">
+          <el-select v-model="form.brand_code" placeholder="请选择品牌" style="width: 100%">
             <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
           </el-select>
         </el-form-item>
-        <el-form-item label="创建人">
-          <el-input v-model="form.creator" />
+        <el-form-item label="口味图片">
+          <div class="photo-upload">
+            <el-image
+              v-if="form.photo"
+              :src="form.photo"
+              fit="cover"
+              style="width: 96px; height: 96px; cursor: pointer; border-radius: 8px; border: 1px solid #dcdfe6;"
+              :preview-src-list="[form.photo]"
+              :initial-index="0"
+            />
+            <div v-else class="photo-placeholder" @click="triggerPhotoUpload">
+              <span>+</span>
+              <span style="font-size: 12px;">上传图片</span>
+            </div>
+            <div v-if="form.photo" style="margin-left: 12px;">
+              <el-button size="small" type="danger" @click="form.photo = ''">移除图片</el-button>
+            </div>
+          </div>
+          <input ref="photoInput" type="file" accept="image/*" style="display:none" @change="handlePhotoUpload" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -82,8 +109,9 @@ const brands = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
-const form = ref({ name: '', brand_code: '', creator: '' })
-const filterForm = ref({ name: '', brand_code: '', creator: '' })
+const photoInput = ref(null)
+const form = ref({ name: '', brand_code: '', photo: '' })
+const filterForm = ref({ name: '', brand_code: '' })
 const pagination = ref({ page: 1, pageSize: 20 })
 
 const dialogTitle = computed(() => dialogType.value === 'create' ? '新增口味' : '编辑口味')
@@ -92,7 +120,6 @@ const filteredData = computed(() => {
   return flavors.value.filter(f => {
     if (filterForm.value.name && !f.name.includes(filterForm.value.name)) return false
     if (filterForm.value.brand_code && f.brand_code !== filterForm.value.brand_code) return false
-    if (filterForm.value.creator && !f.creator?.includes(filterForm.value.creator)) return false
     return true
   })
 })
@@ -119,14 +146,25 @@ const loadBrands = async () => {
 }
 
 const handleSearch = () => { pagination.value.page = 1 }
-const handleReset = () => { filterForm.value = { name: '', brand_code: '', creator: '' }; pagination.value.page = 1 }
+const handleReset = () => { filterForm.value = { name: '', brand_code: '' }; pagination.value.page = 1 }
+
+const triggerPhotoUpload = () => { photoInput.value.click() }
+
+const handlePhotoUpload = (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  if (file.size > 5 * 1024 * 1024) { ElMessage.warning('图片大小不能超过5MB'); return }
+  const reader = new FileReader()
+  reader.onload = (ev) => { form.value.photo = ev.target.result }
+  reader.readAsDataURL(file)
+}
 
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { code: row.code, name: row.name, brand_code: row.brand_code, creator: row.creator || '' }
+    form.value = { code: row.code, name: row.name, brand_code: row.brand_code, photo: row.photo || '' }
   } else {
-    form.value = { name: '', brand_code: '', creator: '' }
+    form.value = { name: '', brand_code: '', photo: '' }
   }
   dialogVisible.value = true
 }
@@ -163,7 +201,12 @@ onMounted(() => { loadFlavors(); loadBrands() })
 
 <style scoped>
 .page-container { display: flex; flex-direction: column; gap: 16px; height: 100%; }
-.filter-card { }
 .table-card { flex: 1; }
 .pagination { margin-top: 16px; display: flex; justify-content: flex-end; }
+.photo-upload { display: flex; align-items: center; gap: 0; }
+.photo-placeholder {
+  width: 96px; height: 96px; border: 1px dashed #dcdfe6; border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; color: #909399; gap: 4px;
+}
 </style>
