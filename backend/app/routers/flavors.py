@@ -15,10 +15,12 @@ class FlavorListResponse(BaseModel):
 
 
 @router.get("/", response_model=FlavorListResponse)
-def list_flavors(name: str = None, brand_code: int = None, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+def list_flavors(name: str = None, brand_code: int = None, flavor_code: int = None, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     query = db.query(FlavorModel).options(joinedload(FlavorModel.brand))
     if brand_code:
         query = query.filter(FlavorModel.brand_code == brand_code)
+    if flavor_code:
+        query = query.filter(FlavorModel.code == flavor_code)
     if name:
         query = query.filter(FlavorModel.name.like(f"%{name}%"))
     total = query.count()

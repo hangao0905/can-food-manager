@@ -5,21 +5,56 @@
       <template #header>
         <div class="card-header">
           <span>查询条件</span>
-          <el-button type="primary" @click="handleSearch">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
         </div>
       </template>
       
-      <el-form :model="searchForm" inline>
-        <el-form-item label="所属品牌">
-          <el-select v-model="searchForm.brand_code" placeholder="请选择品牌" clearable>
-            <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
+      <el-form :model="searchForm" :inline="true">
+        <el-form-item label="所属品牌" class="brand-select-item">
+          <el-select 
+            v-model="searchForm.brand_code" 
+            placeholder="请选择品牌" 
+            clearable
+            @change="handleBrandChange"
+            class="brand-select"
+          >
+            <el-option 
+              v-for="b in brands" 
+              :key="b.code" 
+              :label="b.name" 
+              :value="b.code" 
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属口味" class="flavor-select-item" v-if="searchForm.brand_code">
+          <el-select 
+            v-model="searchForm.flavor_code" 
+            placeholder="请选择口味" 
+            clearable
+            filterable
+            class="flavor-select"
+          >
+            <el-option 
+              v-for="f in filteredFlavors" 
+              :key="f.code" 
+              :label="f.name" 
+              :value="f.code" 
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="口味名称">
-          <el-input v-model="searchForm.name" placeholder="请输入口味名称" clearable />
+          <el-input 
+            v-model="searchForm.name" 
+            placeholder="请输入口味名称" 
+            clearable 
+            style="width: 200px;"
+          />
         </el-form-item>
       </el-form>
+      
+      <div class="button-group">
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button @click="handleReset">重置</el-button>
+      </div>
     </el-card>
 
     <!-- 下卡片：查询结果 -->
@@ -34,7 +69,7 @@
       <el-table :data="flavors" stripe v-loading="loading">
         <el-table-column prop="code" label="Code" width="80" />
         <el-table-column prop="name" label="口味名称" />
-        <el-table-column prop="brand.name" label="所属品牌" />
+        <el-table-column prop="brand.name" label="所属品牌" width="150" />
         <el-table-column prop="created_date" label="创建时间" width="120" />
         <el-table-column label="操作" width="180">
           <template #default="{ row }">
@@ -62,11 +97,20 @@
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
       <el-form :model="form" label-width="80px">
         <el-form-item label="口味名称">
-          <el-input v-model="form.name" />
+          <el-input v-model="form.name" placeholder="请输入口味名称" />
         </el-form-item>
         <el-form-item label="所属品牌">
-          <el-select v-model="form.brand_code" placeholder="请选择品牌">
-            <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
+          <el-select 
+            v-model="form.brand_code" 
+            placeholder="请选择品牌"
+            class="full-width-select"
+          >
+            <el-option 
+              v-for="b in brands" 
+              :key="b.code" 
+              :label="b.name" 
+              :value="b.code" 
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="创建时间">
@@ -88,12 +132,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { flavorApi, brandApi } from '../api'
 
 const flavors = ref([])
 const brands = ref([])
+const allFlavors = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
@@ -108,13 +153,26 @@ const pagination = ref({
 // 查询表单
 const searchForm = ref({
   name: '',
-  brand_code: null
+  brand_code: null,
+  flavor_code: null
 })
 
 // 新增/编辑表单
-const form = ref({ name: '', brand_code: '', created_date: '', photo: '', creator: '' })
+const form = ref({ 
+  name: '', 
+  brand_code: '', 
+  created_date: '', 
+  photo: '', 
+  creator: '' 
+})
 
 const dialogTitle = computed(() => dialogType.value === 'create' ? '新增口味' : '编辑口味')
+
+// 根据选择的品牌过滤口味
+const filteredFlavors = computed(() => {
+  if (!searchForm.value.brand_code) return []
+  return allFlavors.value.filter(f => f.brand_code === searchForm.value.brand_code)
+})
 
 // 加载口味列表
 const loadFlavors = async () => {
@@ -130,13 +188,27 @@ const loadFlavors = async () => {
     if (searchForm.value.brand_code) {
       params.brand_code = searchForm.value.brand_code
     }
+    if (searchForm.value.flavor_code) {
+      params.flavor_code = searchForm.value.flavor_code
+    }
     const { data } = await flavorApi.list(params)
     flavors.value = data.data
     total.value = data.total
   } catch (error) {
+    console.error('加载口味失败', error)
     ElMessage.error('加载口味失败')
   } finally {
     loading.value = false
+  }
+}
+
+// 加载所有口味（用于下拉框联动）
+const loadAllFlavors = async () => {
+  try {
+    const { data } = await flavorApi.list({ limit: 1000 })
+    allFlavors.value = data.data || []
+  } catch (error) {
+    console.error('加载口味列表失败', error)
   }
 }
 
@@ -144,10 +216,15 @@ const loadFlavors = async () => {
 const loadBrands = async () => {
   try {
     const { data } = await brandApi.list()
-    brands.value = data
+    brands.value = data || []
   } catch (error) {
     console.error('加载品牌失败', error)
   }
+}
+
+// 品牌选择变化
+const handleBrandChange = () => {
+  searchForm.value.flavor_code = null
 }
 
 // 查询
@@ -160,7 +237,8 @@ const handleSearch = () => {
 const handleReset = () => {
   searchForm.value = {
     name: '',
-    brand_code: null
+    brand_code: null,
+    flavor_code: null
   }
   pagination.value.page = 1
   pagination.value.pageSize = 20
@@ -182,15 +260,36 @@ const handlePageChange = () => {
 const showDialog = (type, row = null) => {
   dialogType.value = type
   if (type === 'edit' && row) {
-    form.value = { ...row }
+    form.value = { 
+      name: row.name, 
+      brand_code: row.brand_code, 
+      created_date: row.created_date || '', 
+      photo: row.photo || '', 
+      creator: row.creator || '',
+      code: row.code
+    }
   } else {
-    form.value = { name: '', brand_code: '', created_date: '', photo: '', creator: '' }
+    form.value = { 
+      name: '', 
+      brand_code: '', 
+      created_date: '', 
+      photo: '', 
+      creator: '' 
+    }
   }
   dialogVisible.value = true
 }
 
 // 提交表单
 const handleSubmit = async () => {
+  if (!form.value.name) {
+    ElMessage.warning('请输入口味名称')
+    return
+  }
+  if (!form.value.brand_code) {
+    ElMessage.warning('请选择所属品牌')
+    return
+  }
   try {
     if (dialogType.value === 'create') {
       await flavorApi.create(form.value)
@@ -201,6 +300,7 @@ const handleSubmit = async () => {
     }
     dialogVisible.value = false
     loadFlavors()
+    loadAllFlavors()
   } catch (error) {
     ElMessage.error(error.response?.data?.detail || '操作失败')
   }
@@ -222,6 +322,7 @@ const handleDelete = async (row) => {
 
 onMounted(() => {
   loadFlavors()
+  loadAllFlavors()
   loadBrands()
 })
 </script>
@@ -254,5 +355,32 @@ onMounted(() => {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+.brand-select {
+  width: 200px;
+}
+
+.flavor-select {
+  width: 200px;
+}
+
+.full-width-select {
+  width: 100%;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-left: 8px;
+}
+
+:deep(.el-form--inline .el-form-item) {
+  margin-right: 16px;
+}
+
+:deep(.el-select) {
+  width: 200px;
 }
 </style>
