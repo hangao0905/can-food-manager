@@ -9,13 +9,16 @@ from app.schemas.schemas import Flavor, FlavorCreate, FlavorUpdate
 router = APIRouter(prefix="/flavors", tags=["口味管理"])
 
 
-@router.get("/", response_model=List[Flavor])
-def list_flavors(brand_code: int = None, skip: int = 0, limit: int = 1000, db: Session = Depends(get_db)):
+@router.get("/", response_model=dict)
+def list_flavors(name: str = None, brand_code: int = None, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     query = db.query(FlavorModel).options(joinedload(FlavorModel.brand))
     if brand_code:
         query = query.filter(FlavorModel.brand_code == brand_code)
+    if name:
+        query = query.filter(FlavorModel.name.like(f"%{name}%"))
+    total = query.count()
     flavors = query.offset(skip).limit(limit).all()
-    return flavors
+    return {"total": total, "data": flavors}
 
 
 @router.get("/{flavor_code}", response_model=Flavor)
