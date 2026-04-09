@@ -200,77 +200,94 @@
       <el-form :model="form" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="罐头名称">
-              <el-input v-model="form.description" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="品牌">
+            <el-form-item label="品牌" required>
               <el-select v-model="form.brand_code" placeholder="请选择品牌">
                 <el-option v-for="b in brands" :key="b.code" :label="b.name" :value="b.code" />
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="口味">
-              <el-select v-model="form.flavor_code" placeholder="请选择口味">
+              <el-select v-model="form.flavor_code" placeholder="请选择口味" clearable>
                 <el-option v-for="f in flavors" :key="f.code" :label="`${f.brand?.name || ''} - ${f.name}`" :value="f.code" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="蛋白质(g)">
-              <el-input-number v-model="form.protein" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
         </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="脂肪(g)">
-              <el-input-number v-model="form.fat" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="水分(g)">
-              <el-input-number v-model="form.moisture" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="磷(mg)">
-              <el-input-number v-model="form.phosphorus_wet" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="钙(mg)">
-              <el-input-number v-model="form.calcium_wet" :min="0" :precision="1" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="蛋白质合格">
-              <el-select v-model="form.protein_pass" placeholder="请选择">
-                <el-option label="合格" value="合格" />
-                <el-option label="不合格" value="不合格" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="脂肪合格">
-              <el-select v-model="form.fat_pass" placeholder="请选择">
-                <el-option label="合格" value="合格" />
-                <el-option label="不合格" value="不合格" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="简介">
-          <el-input v-model="form.description" type="textarea" rows="3" />
+        <el-form-item label="罐头名称">
+          <el-input v-model="form.description" placeholder="请输入罐头名称" />
         </el-form-item>
+        <el-form-item label="简介">
+          <el-input v-model="form.description" type="textarea" rows="2" placeholder="请输入简介" />
+        </el-form-item>
+        <el-divider content-position="left">营养成分（湿基）</el-divider>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="蛋白质(g)">
+              <el-input-number v-model="form.protein" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="脂肪(g)">
+              <el-input-number v-model="form.fat" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="灰分(g)">
+              <el-input-number v-model="form.ash" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="纤维(g)">
+              <el-input-number v-model="form.fiber" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="水分(g)">
+              <el-input-number v-model="form.moisture" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="无抽出物(g)">
+              <el-input-number v-model="form.nfe_wet" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="钙(mg/100g)">
+              <el-input-number v-model="form.calcium_wet" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="磷(mg/100g)">
+              <el-input-number v-model="form.phosphorus_wet" :min="0" :precision="1" placeholder="0" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-divider content-position="left">标称信息</el-divider>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="标称能量(kcal)">
+              <el-input-number v-model="form.labeled_kcal" :min="0" :precision="1" placeholder="可选" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-alert
+          type="info"
+          :closable="false"
+          show-icon
+          style="margin-top: 10px;"
+        >
+          <template #title>
+            <span>提示：以下字段由系统根据标准自动计算</span>
+          </template>
+          <template #default>
+            钙磷比、干物质基础指标(NFE除外)、能量、能量百分比、合格判定等字段由系统根据 /standards 中的标准自动计算，无需手工填写。
+          </template>
+        </el-alert>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
