@@ -10,19 +10,9 @@
           <el-input v-model="filterForm.alias" placeholder="模糊搜索" clearable />
         </el-form-item>
         <el-form-item label="国家">
-          <el-select 
-            v-model="filterForm.country" 
-            placeholder="全部" 
-            clearable 
-            style="width: 120px"
-            :loading="countriesLoading"
-          >
-            <el-option 
-              v-for="country in countries" 
-              :key="country.id" 
-              :value="country.name" 
-              :label="country.name" 
-            />
+          <el-select v-model="filterForm.country" placeholder="全部" clearable style="width: 120px">
+            <el-option value="国内" label="国内" />
+            <el-option value="国外" label="国外" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -59,7 +49,7 @@
         </el-table-column>
         <el-table-column prop="country" label="国家" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="getCountryTagType(row.country)" size="small">
+            <el-tag :type="row.country === '国内' ? 'success' : 'warning'" size="small">
               {{ row.country || '-' }}
             </el-tag>
           </template>
@@ -106,13 +96,9 @@
           />
         </el-form-item>
         <el-form-item label="国家">
-          <el-select v-model="form.country" placeholder="请选择" style="width: 100%" :loading="countriesLoading">
-            <el-option 
-              v-for="country in countries" 
-              :key="country.id" 
-              :value="country.name" 
-              :label="country.name" 
-            />
+          <el-select v-model="form.country" placeholder="请选择" style="width: 100%">
+            <el-option value="国内" label="国内" />
+            <el-option value="国外" label="国外" />
           </el-select>
         </el-form-item>
         <el-form-item label="创建时间">
@@ -133,11 +119,9 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
 
 const loading = ref(false)
-const countriesLoading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
 const brands = ref([])
-const countries = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const formRef = ref()
@@ -181,19 +165,6 @@ const loadBrands = async () => {
   }
 }
 
-// 加载国家数据
-const loadCountries = async () => {
-  countriesLoading.value = true
-  try {
-    const { data } = await axios.get('/api/countries/')
-    countries.value = data
-  } catch (error) {
-    ElMessage.error('加载国家数据失败')
-  } finally {
-    countriesLoading.value = false
-  }
-}
-
 // 过滤数据
 const filteredData = computed(() => {
   return brands.value.filter(brand => {
@@ -212,13 +183,6 @@ const pagedData = computed(() => {
   const end = start + pageSize.value
   return filteredData.value.slice(start, end)
 })
-
-// 获取国家标签类型
-const getCountryTagType = (country) => {
-  if (!country) return 'info'
-  const domesticCountries = ['中国', '台湾', '香港', '澳门']
-  return domesticCountries.includes(country) ? 'success' : 'warning'
-}
 
 // 查询
 const handleSearch = () => {
@@ -301,7 +265,6 @@ const handleCurrentChange = (val) => {
 
 onMounted(() => {
   loadBrands()
-  loadCountries()
 })
 </script>
 
