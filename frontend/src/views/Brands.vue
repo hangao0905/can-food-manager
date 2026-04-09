@@ -1,20 +1,36 @@
 <template>
   <div class="page-container">
-    <!-- 上部：查询条件 -->
-    <el-card class="filter-card">
-      <el-form :inline="true" :model="filterForm">
+    <!-- 上卡片：查询条件 -->
+    <el-card class="search-card">
+      <template #header>
+        <div class="card-header">
+          <span>查询条件</span>
+        </div>
+      </template>
+      
+      <el-form :model="filterForm" :inline="true">
         <el-form-item label="品牌名称">
-          <el-input v-model="filterForm.name" placeholder="模糊搜索" clearable />
+          <el-input 
+            v-model="filterForm.name" 
+            placeholder="请输入品牌名称" 
+            clearable 
+            style="width: 150px;"
+          />
         </el-form-item>
         <el-form-item label="通俗名">
-          <el-input v-model="filterForm.alias" placeholder="模糊搜索" clearable />
+          <el-input 
+            v-model="filterForm.alias" 
+            placeholder="请输入通俗名" 
+            clearable 
+            style="width: 150px;"
+          />
         </el-form-item>
         <el-form-item label="国家">
           <el-select 
             v-model="filterForm.country" 
             placeholder="全部" 
             clearable 
-            style="width: 120px"
+            style="width: 150px;"
             :loading="countriesLoading"
           >
             <el-option 
@@ -25,37 +41,28 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
-          <el-button type="success" @click="showDialog('create')">新增品牌</el-button>
-        </el-form-item>
       </el-form>
+      
+      <div class="button-group">
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button @click="handleReset">重置</el-button>
+      </div>
     </el-card>
 
-    <!-- 下部：数据明细 -->
-    <el-card class="table-card">
+    <!-- 下卡片：查询结果 -->
+    <el-card class="result-card">
+      <template #header>
+        <div class="card-header">
+          <span>查询结果 (共 {{ filteredData.length }} 条)</span>
+          <el-button type="success" @click="showDialog('create')">新增品牌</el-button>
+        </div>
+      </template>
+      
       <el-table :data="pagedData" stripe v-loading="loading">
-        <el-table-column label="Logo" width="70" align="center">
-          <template #default="{ row }">
-            <el-image
-              v-if="row.logo"
-              :src="row.logo"
-              fit="contain"
-              style="width: 40px; height: 40px; cursor: pointer; border-radius: 4px;"
-              :preview-src-list="[row.logo]"
-              :initial-index="0"
-            />
-            <span v-else style="color: #c0c4cc; font-size: 12px;">无</span>
-          </template>
-        </el-table-column>
         <el-table-column prop="code" label="ID" width="70" />
-        <el-table-column prop="name" label="品牌名称" min-width="120" />
-        <el-table-column prop="alias" label="通俗名" min-width="120">
+        <el-table-column prop="name" label="品牌名称" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="alias" label="通俗名" min-width="100" show-overflow-tooltip>
           <template #default="{ row }">{{ row.alias || '-' }}</template>
-        </el-table-column>
-        <el-table-column prop="description" label="简介" show-overflow-tooltip min-width="160">
-          <template #default="{ row }">{{ row.description || '-' }}</template>
         </el-table-column>
         <el-table-column prop="country" label="国家" width="90" align="center">
           <template #default="{ row }">
@@ -64,7 +71,24 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="created_date" label="创建时间" width="120" />
+        <el-table-column prop="description" label="简介" min-width="200" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.description || '-' }}</template>
+        </el-table-column>
+        <el-table-column label="Logo" width="80" align="center">
+          <template #default="{ row }">
+            <el-image
+              v-if="row.logo"
+              :src="row.logo"
+              fit="contain"
+              style="width: 50px; height: 50px; cursor: pointer; border-radius: 4px;"
+              :preview-src-list="[row.logo]"
+              :initial-index="0"
+              preview-teleported
+            />
+            <span v-else style="color: #c0c4cc; font-size: 12px;">无</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="created_date" label="创建时间" width="150" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
@@ -73,16 +97,17 @@
         </el-table-column>
       </el-table>
       
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="filteredData.length"
-        layout="total, sizes, prev, pager, next, jumper"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        style="margin-top: 20px;"
-      />
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="filteredData.length"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
     </el-card>
 
     <!-- 新增/编辑对话框 -->
@@ -106,7 +131,7 @@
           />
         </el-form-item>
         <el-form-item label="国家">
-          <el-select v-model="form.country" placeholder="请选择" style="width: 100%" :loading="countriesLoading">
+          <el-select v-model="form.country" placeholder="请选择" style="width: 100%">
             <el-option 
               v-for="country in countries" 
               :key="country.id" 
@@ -188,7 +213,7 @@ const loadCountries = async () => {
     const { data } = await axios.get('/api/countries/')
     countries.value = data
   } catch (error) {
-    ElMessage.error('加载国家数据失败')
+    console.error('加载国家数据失败', error)
   } finally {
     countriesLoading.value = false
   }
@@ -289,14 +314,13 @@ const handleDelete = async (row) => {
 }
 
 // 分页大小改变
-const handleSizeChange = (val) => {
-  pageSize.value = val
+const handleSizeChange = () => {
   currentPage.value = 1
 }
 
 // 当前页改变
-const handleCurrentChange = (val) => {
-  currentPage.value = val
+const handleCurrentChange = () => {
+  // 无需操作
 }
 
 onMounted(() => {
@@ -306,10 +330,43 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.filter-card {
-  margin-bottom: 20px;
+.page-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-.table-card {
-  margin-top: 20px;
+
+.search-card {
+  flex-shrink: 0;
+}
+
+.result-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pagination-container {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-left: 8px;
+}
+
+:deep(.el-form--inline .el-form-item) {
+  margin-right: 16px;
 }
 </style>

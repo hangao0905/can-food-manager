@@ -1,40 +1,159 @@
 <template>
   <div class="page-container">
-    <el-card>
+    <!-- 上卡片：查询条件 -->
+    <el-card class="search-card">
       <template #header>
         <div class="card-header">
-          <span>罐头管理</span>
-          <el-button type="primary" @click="showDialog('create')">新增罐头</el-button>
+          <span>查询条件</span>
+        </div>
+      </template>
+      
+      <el-form :model="searchForm" :inline="true">
+        <el-form-item label="所属品牌">
+          <el-select 
+            v-model="searchForm.brand_code" 
+            placeholder="全部" 
+            clearable
+            style="width: 150px;"
+            @change="handleBrandChange"
+          >
+            <el-option 
+              v-for="b in brands" 
+              :key="b.code" 
+              :label="b.name" 
+              :value="b.code" 
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属口味">
+          <el-select 
+            v-model="searchForm.flavor_code" 
+            placeholder="全部" 
+            clearable
+            filterable
+            style="width: 150px;"
+          >
+            <el-option 
+              v-for="f in filteredFlavors" 
+              :key="f.code" 
+              :label="f.name" 
+              :value="f.code" 
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="磷含量(mg)">
+          <el-input-number 
+            v-model="searchForm.min_phosphorus" 
+            :min="0" 
+            :precision="1"
+            placeholder="最小值"
+            style="width: 100px;"
+          />
+          <span style="margin: 0 8px;">-</span>
+          <el-input-number 
+            v-model="searchForm.max_phosphorus" 
+            :min="0" 
+            :precision="1"
+            placeholder="最大值"
+            style="width: 100px;"
+          />
+        </el-form-item>
+        <el-form-item label="蛋白质合格">
+          <el-select v-model="searchForm.protein_pass" placeholder="全部" clearable style="width: 100px;">
+            <el-option label="合格" value="合格" />
+            <el-option label="不合格" value="不合格" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="脂肪合格">
+          <el-select v-model="searchForm.fat_pass" placeholder="全部" clearable style="width: 100px;">
+            <el-option label="合格" value="合格" />
+            <el-option label="不合格" value="不合格" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="纤维合格">
+          <el-select v-model="searchForm.fiber_pass" placeholder="全部" clearable style="width: 100px;">
+            <el-option label="合格" value="合格" />
+            <el-option label="不合格" value="不合格" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="灰分合格">
+          <el-select v-model="searchForm.ash_pass" placeholder="全部" clearable style="width: 100px;">
+            <el-option label="合格" value="合格" />
+            <el-option label="不合格" value="不合格" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="水分合格">
+          <el-select v-model="searchForm.moisture_pass" placeholder="全部" clearable style="width: 100px;">
+            <el-option label="合格" value="合格" />
+            <el-option label="不合格" value="不合格" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="钙磷合格">
+          <el-select v-model="searchForm.ca_ph_pass" placeholder="全部" clearable style="width: 100px;">
+            <el-option label="合格" value="合格" />
+            <el-option label="不合格" value="不合格" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      
+      <div class="button-group">
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button @click="handleReset">重置</el-button>
+      </div>
+    </el-card>
+
+    <!-- 下卡片：查询结果 -->
+    <el-card class="result-card">
+      <template #header>
+        <div class="card-header">
+          <span>查询结果 (共 {{ total }} 条)</span>
+          <el-button type="success" @click="showDialog('create')">新增罐头</el-button>
         </div>
       </template>
       
       <el-table :data="canFoods" stripe v-loading="loading">
-        <el-table-column prop="code" label="Code" width="80" />
-        <el-table-column prop="description" label="罐头名称" min-width="150" />
-        <el-table-column prop="brand.name" label="品牌" width="100" />
-        <el-table-column prop="flavor.name" label="口味" width="100" />
-        <el-table-column prop="protein" label="蛋白质" width="80">
-          <template #default="{ row }">{{ row.protein || '-' }}</template>
+        <el-table-column prop="code" label="Code" width="70" />
+        <el-table-column prop="description" label="罐头名称" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="brand.name" label="品牌" width="100" show-overflow-tooltip />
+        <el-table-column prop="flavor.name" label="口味" width="80" show-overflow-tooltip />
+        <el-table-column prop="protein" label="蛋白" width="60" align="center" />
+        <el-table-column prop="fat" label="脂肪" width="60" align="center" />
+        <el-table-column prop="phosphorus_wet" label="磷(mg)" width="80" align="center" />
+        <el-table-column prop="ca_ph_ratio" label="钙磷比" width="70" align="center">
+          <template #default="{ row }">{{ row.ca_ph_ratio ? row.ca_ph_ratio.toFixed(2) : '-' }}</template>
         </el-table-column>
-        <el-table-column prop="fat" label="脂肪" width="80">
-          <template #default="{ row }">{{ row.fat || '-' }}</template>
-        </el-table-column>
-        <el-table-column prop="protein_pass" label="合格" width="80">
+        <el-table-column label="合格" width="200">
           <template #default="{ row }">
-            <el-tag :type="row.protein_pass === '合格' ? 'success' : 'danger'">
-              {{ row.protein_pass || '-' }}
-            </el-tag>
+            <el-tag v-if="row.protein_pass === '合格'" type="success" size="small">蛋白</el-tag>
+            <el-tag v-else-if="row.protein_pass === '不合格'" type="danger" size="small">蛋白</el-tag>
+            <el-tag v-if="row.fat_pass === '合格'" type="success" size="small">脂肪</el-tag>
+            <el-tag v-else-if="row.fat_pass === '不合格'" type="danger" size="small">脂肪</el-tag>
+            <el-tag v-if="row.ca_ph_pass === '合格'" type="success" size="small">钙磷</el-tag>
+            <el-tag v-else-if="row.ca_ph_pass === '不合格'" type="danger" size="small">钙磷</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
             <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
+
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="pagination.page"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handlePageChange"
+        />
+      </div>
     </el-card>
 
+    <!-- 新增/编辑对话框 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="700px" @closed="resetForm">
       <el-form :model="form" label-width="100px">
         <el-row :gutter="20">
@@ -107,9 +226,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="合格说明">
-          <el-input v-model="form.quality_notes" />
-        </el-form-item>
         <el-form-item label="简介">
           <el-input v-model="form.description" type="textarea" rows="3" />
         </el-form-item>
@@ -133,50 +249,140 @@ const brands = ref([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogType = ref('create')
+const total = ref(0)
+
+// 分页参数
+const pagination = ref({
+  page: 1,
+  pageSize: 20
+})
+
+// 查询表单
+const searchForm = ref({
+  brand_code: null,
+  flavor_code: null,
+  min_phosphorus: null,
+  max_phosphorus: null,
+  protein_pass: null,
+  fat_pass: null,
+  fiber_pass: null,
+  ash_pass: null,
+  moisture_pass: null,
+  ca_ph_pass: null
+})
+
+// 对话框表单
 const form = ref({
   brand_code: null, flavor_code: null, description: '',
   protein: null, fat: null, moisture: null,
   phosphorus_wet: null, calcium_wet: null,
-  protein_pass: '合格', fat_pass: '合格', quality_notes: ''
+  protein_pass: '合格', fat_pass: '合格'
 })
 
 const dialogTitle = computed(() => dialogType.value === 'create' ? '新增罐头' : '编辑罐头')
+
+// 根据品牌过滤口味
+const filteredFlavors = computed(() => {
+  if (!searchForm.value.brand_code) return flavors.value
+  return flavors.value.filter(f => f.brand_code === searchForm.value.brand_code)
+})
 
 const defaultForm = () => ({
   brand_code: null, flavor_code: null, description: '',
   protein: null, fat: null, moisture: null,
   phosphorus_wet: null, calcium_wet: null,
-  protein_pass: '合格', fat_pass: '合格', quality_notes: ''
+  protein_pass: '合格', fat_pass: '合格'
 })
 
+// 加载罐头列表
 const loadCanFoods = async () => {
   loading.value = true
   try {
-    const { data } = await canFoodApi.list({ page_size: 100 })
+    const params = {
+      page: pagination.value.page,
+      page_size: pagination.value.pageSize
+    }
+    if (searchForm.value.brand_code) params.brand_code = searchForm.value.brand_code
+    if (searchForm.value.flavor_code) params.flavor_code = searchForm.value.flavor_code
+    if (searchForm.value.min_phosphorus) params.min_phosphorus = searchForm.value.min_phosphorus
+    if (searchForm.value.max_phosphorus) params.max_phosphorus = searchForm.value.max_phosphorus
+    if (searchForm.value.protein_pass) params.protein_pass = searchForm.value.protein_pass
+    if (searchForm.value.fat_pass) params.fat_pass = searchForm.value.fat_pass
+    if (searchForm.value.fiber_pass) params.fiber_pass = searchForm.value.fiber_pass
+    if (searchForm.value.ash_pass) params.ash_pass = searchForm.value.ash_pass
+    if (searchForm.value.moisture_pass) params.moisture_pass = searchForm.value.moisture_pass
+    if (searchForm.value.ca_ph_pass) params.ca_ph_pass = searchForm.value.ca_ph_pass
+    
+    const { data } = await canFoodApi.list(params)
     canFoods.value = data
+    total.value = data.length
   } catch (error) {
+    console.error('加载罐头失败', error)
     ElMessage.error('加载罐头失败')
   } finally {
     loading.value = false
   }
 }
 
+// 加载口味列表
 const loadFlavors = async () => {
   try {
-    const { data } = await flavorApi.list({ page_size: 100 })
-    flavors.value = data
+    const { data } = await flavorApi.list({ limit: 1000 })
+    flavors.value = data.data || []
   } catch (error) {
     console.error('加载口味失败', error)
   }
 }
 
+// 加载品牌列表
 const loadBrands = async () => {
   try {
     const { data } = await brandApi.list()
-    brands.value = data
+    brands.value = data || []
   } catch (error) {
     console.error('加载品牌失败', error)
   }
+}
+
+// 品牌选择变化
+const handleBrandChange = () => {
+  searchForm.value.flavor_code = null
+}
+
+// 查询
+const handleSearch = () => {
+  pagination.value.page = 1
+  loadCanFoods()
+}
+
+// 重置
+const handleReset = () => {
+  searchForm.value = {
+    brand_code: null,
+    flavor_code: null,
+    min_phosphorus: null,
+    max_phosphorus: null,
+    protein_pass: null,
+    fat_pass: null,
+    fiber_pass: null,
+    ash_pass: null,
+    moisture_pass: null,
+    ca_ph_pass: null
+  }
+  pagination.value.page = 1
+  pagination.value.pageSize = 20
+  loadCanFoods()
+}
+
+// 分页大小改变
+const handleSizeChange = () => {
+  pagination.value.page = 1
+  loadCanFoods()
+}
+
+// 页码改变
+const handlePageChange = () => {
+  loadCanFoods()
 }
 
 const showDialog = (type, row = null) => {
@@ -233,10 +439,42 @@ onMounted(() => {
 <style scoped>
 .page-container {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
+
+.search-card {
+  flex-shrink: 0;
+}
+
+.result-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.pagination-container {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-left: 8px;
+}
+
+:deep(.el-form--inline .el-form-item) {
+  margin-right: 16px;
+  margin-bottom: 12px;
 }
 </style>

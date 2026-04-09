@@ -21,7 +21,14 @@ def list_can_foods(
     max_protein: float = None,
     min_fat: float = None,
     max_fat: float = None,
+    min_phosphorus: float = None,
+    max_phosphorus: float = None,
     protein_pass: str = None,
+    fat_pass: str = None,
+    fiber_pass: str = None,
+    ash_pass: str = None,
+    moisture_pass: str = None,
+    ca_ph_pass: str = None,
     page: int = 1,
     page_size: int = 100,
     db: Session = Depends(get_db)
@@ -45,8 +52,22 @@ def list_can_foods(
         query = query.filter(CanFoodModel.fat >= min_fat)
     if max_fat is not None:
         query = query.filter(CanFoodModel.fat <= max_fat)
+    if min_phosphorus is not None:
+        query = query.filter(CanFoodModel.phosphorus_wet >= min_phosphorus)
+    if max_phosphorus is not None:
+        query = query.filter(CanFoodModel.phosphorus_wet <= max_phosphorus)
     if protein_pass is not None:
         query = query.filter(CanFoodModel.protein_pass == protein_pass)
+    if fat_pass is not None:
+        query = query.filter(CanFoodModel.fat_pass == fat_pass)
+    if fiber_pass is not None:
+        query = query.filter(CanFoodModel.fiber_pass == fiber_pass)
+    if ash_pass is not None:
+        query = query.filter(CanFoodModel.ash_pass == ash_pass)
+    if moisture_pass is not None:
+        query = query.filter(CanFoodModel.moisture_pass == moisture_pass)
+    if ca_ph_pass is not None:
+        query = query.filter(CanFoodModel.ca_ph_pass == ca_ph_pass)
     
     skip = (page - 1) * page_size
     can_foods = query.offset(skip).limit(page_size).all()

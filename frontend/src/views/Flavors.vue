@@ -67,11 +67,24 @@
       </template>
       
       <el-table :data="flavors" stripe v-loading="loading">
-        <el-table-column prop="code" label="Code" width="80" />
-        <el-table-column prop="name" label="口味名称" />
-        <el-table-column prop="brand.name" label="所属品牌" width="150" />
-        <el-table-column prop="created_date" label="创建时间" width="120" />
-        <el-table-column label="操作" width="180">
+        <el-table-column prop="code" label="Code" width="70" />
+        <el-table-column prop="name" label="口味名称" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="brand.name" label="所属品牌" width="120" show-overflow-tooltip />
+        <el-table-column label="图片" width="80" align="center">
+          <template #default="{ row }">
+            <el-image
+              v-if="row.photo"
+              :src="row.photo"
+              :preview-src-list="[row.photo]"
+              fit="cover"
+              style="width: 50px; height: 50px; cursor: pointer; border-radius: 4px;"
+              preview-teleported
+            />
+            <span v-else style="color: #999; font-size: 12px;">无</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="created_date" label="创建时间" width="150" />
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="showDialog('edit', row)">编辑</el-button>
             <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
