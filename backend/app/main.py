@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import brands, flavors, can_foods, countries
+from app.routers import auth, brands, flavors, can_foods, countries
 
 app = FastAPI(title="Can Food Manager API")
 
@@ -20,6 +20,7 @@ async def health_check():
     return {"status": "ok"}
 
 # 路由
+app.include_router(auth, tags=["auth"])
 app.include_router(brands, prefix="/api", tags=["brands"])
 app.include_router(flavors, prefix="/api", tags=["flavors"])
 app.include_router(can_foods, prefix="/api", tags=["can_foods"])
