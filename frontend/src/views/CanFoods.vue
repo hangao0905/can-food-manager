@@ -156,6 +156,23 @@
         <el-table-column prop="carb_met_energy_pct" label="碳水能量%" width="95" align="center">
           <template #default="{ row }">{{ row.carb_met_energy_pct != null ? row.carb_met_energy_pct.toFixed(3) + '%' : '-' }}</template>
         </el-table-column>
+        <el-table-column prop="calcium_per_1000kal" label="钙mg/1000kal" width="100" align="center">
+          <template #default="{ row }">{{ row.calcium_per_1000kal != null ? row.calcium_per_1000kal.toFixed(2) : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="phosphorus_per_1000kal" label="磷mg/1000kal" width="100" align="center">
+          <template #default="{ row }">{{ row.phosphorus_per_1000kal != null ? row.phosphorus_per_1000kal.toFixed(2) : '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="phosphorus_level" label="磷含量指标" width="85" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.phosphorus_level === '高磷'" type="danger" size="small">{{ row.phosphorus_level }}</el-tag>
+            <el-tag v-else-if="row.phosphorus_level === '低磷'" type="success" size="small">{{ row.phosphorus_level }}</el-tag>
+            <el-tag v-else-if="row.phosphorus_level === '中磷'" type="warning" size="small">{{ row.phosphorus_level }}</el-tag>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="protein_fat_ratio" label="蛋白/脂肪" width="80" align="center">
+          <template #default="{ row }">{{ row.protein_fat_ratio != null ? row.protein_fat_ratio.toFixed(2) : '-' }}</template>
+        </el-table-column>
         <el-table-column label="合格判定" width="260">
           <template #default="{ row }">
             <el-tag v-if="row.protein_pass === '合格'" type="success" size="small">蛋白</el-tag>

@@ -172,6 +172,29 @@ def calculate_can_food(db: Session, can_food: CanFoodModel) -> CanFoodModel:
         can_food.fat_met_energy_pct = (can_food.fat_kcal / can_food.total_energy_kcal) * 100
         can_food.carb_met_energy_pct = (can_food.carb_kcal / can_food.total_energy_kcal) * 100
     
+    # 计算每1000kcal的营养素含量（营养密度指标）
+    if can_food.total_energy_kcal and can_food.total_energy_kcal > 0:
+        # 能量单位是kcal/100g，换算成kcal/kg需要*10
+        energy_per_kg = can_food.total_energy_kcal * 10  # kcal/kg
+        factor = 1000 / energy_per_kg if energy_per_kg > 0 else 0
+        if can_food.calcium_wet is not None:
+            can_food.calcium_per_1000kal = can_food.calcium_wet * factor
+        if can_food.phosphorus_wet is not None:
+            can_food.phosphorus_per_1000kal = can_food.phosphorus_wet * factor
+    
+    # 计算磷含量指标（高磷/中磷/低磷）
+    if can_food.phosphorus_per_1000kal is not None:
+        if can_food.phosphorus_per_1000kal > 2400:
+            can_food.phosphorus_level = '高磷'
+        elif can_food.phosphorus_per_1000kal < 1800:
+            can_food.phosphorus_level = '低磷'
+        else:
+            can_food.phosphorus_level = '中磷'
+    
+    # 计算蛋白质/脂肪比值
+    if can_food.protein is not None and can_food.fat is not None and can_food.fat > 0:
+        can_food.protein_fat_ratio = can_food.protein / can_food.fat
+    
     # 根据标准判断合格
     def check_pass(field_value, standard):
         if field_value is None or standard is None:

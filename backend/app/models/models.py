@@ -53,6 +53,7 @@ class CanFood(Base):
     calcium_per_1000kal = Column(Float, nullable=True)
     phosphorus_per_1000kal = Column(Float, nullable=True)
     phosphorus_level = Column(Text, nullable=True)
+    protein_fat_ratio = Column(Float, nullable=True)
     nfe_dm = Column(Float, nullable=True)
     protein_dm = Column(Float, nullable=True)
     fat_dm = Column(Float, nullable=True)
