@@ -20,7 +20,7 @@ async def health_check():
     return {"status": "ok"}
 
 # 路由
-app.include_router(brands.router, prefix="/api", tags=["brands"])
-app.include_router(flavors.router, prefix="/api", tags=["flavors"])
-app.include_router(can_foods.router, prefix="/api", tags=["can_foods"])
-app.include_router(countries.router, prefix="/api", tags=["countries"])
+app.include_router(brands, prefix="/api", tags=["brands"])
+app.include_router(flavors, prefix="/api", tags=["flavors"])
+app.include_router(can_foods, prefix="/api", tags=["can_foods"])
+app.include_router(countries, prefix="/api", tags=["countries"])
