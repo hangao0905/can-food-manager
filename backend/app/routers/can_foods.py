@@ -75,6 +75,18 @@ def list_can_foods(
     return can_foods
 
 
+@router.post("/recalc-all")
+def recalc_all_can_foods(db: Session = Depends(get_db)):
+    """重新计算所有罐头的派生字段"""
+    can_foods = db.query(CanFoodModel).all()
+    count = 0
+    for can_food in can_foods:
+        calculate_can_food(db, can_food)
+        count += 1
+    db.commit()
+    return {"message": f"重新计算完成，共处理 {count} 条记录"}
+
+
 @router.get("/{can_food_code}", response_model=CanFood)
 def get_can_food(can_food_code: int, db: Session = Depends(get_db)):
     can_food = db.query(CanFoodModel).options(
@@ -241,15 +253,3 @@ def calculate_can_food(db: Session, can_food: CanFoodModel) -> CanFoodModel:
         can_food.ca_ph_pass = check_pass(can_food.ca_ph_ratio, standards_map['ca_ph_ratio'])
     
     return can_food
-
-
-@router.post("/recalc-all")
-def recalc_all_can_foods(db: Session = Depends(get_db)):
-    """重新计算所有罐头的派生字段"""
-    can_foods = db.query(CanFoodModel).all()
-    count = 0
-    for can_food in can_foods:
-        calculate_can_food(db, can_food)
-        count += 1
-    db.commit()
-    return {"message": f"重新计算完成，共处理 {count} 条记录"}
