@@ -1,0 +1,467 @@
+[
+  {
+    "fields": {
+      "code": "20250404001",
+      "创建人": [
+        {
+          "avatar_url": "https://s3-imfile.feishucdn.com/static-resource/v1/v3_00tf_4206c5c4-e989-4202-98a3-ae6382ff97dg~?image_size=72x72&cut_type=default-face&quality=&format=jpeg&sticker_format=.webp",
+          "email": "",
+          "en_name": "用户520905",
+          "id": "ou_e06a2facced6a4a429d5ae5805641cc1",
+          "name": "用户520905"
+        }
+      ],
+      "创建日期": 1743775200000,
+      "口味": [
+        {
+          "text": "鸡肉",
+          "type": "text"
+        }
+      ],
+      "含水量合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "品牌": "gussto",
+      "水分含量": 0.8,
+      "磷含量-湿基": 0.0019,
+      "粗NFE%计【粗碳水】": 0.002,
+      "粗灰分合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "不合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗灰分含量": 0.024,
+      "粗纤维合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗纤维含量": 0.004,
+      "粗脂肪合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗蛋白合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "罐头简介": [
+        {
+          "text": "Gussto恶魔喵鸡肉口味，德国进口无谷主食罐。70%鸡肉（约2/3鸡肉与鸡心、约1/3鸡肝、鸡胗、鸡脖子），28.8%烹饪肉汁，1%营养矿物质，0.2%红花籽油。无谷无麸质，双倍牛磺酸，单一肉源L.I.D.，符合猫咪天然饮食需求。",
+          "type": "text"
+        }
+      ],
+      "脂肪含量": 0.062,
+      "蛋白质含量": 0.108,
+      "蛋白质含量合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "不合格",
+            "type": "text"
+          }
+        ]
+      },
+      "钙含量-湿基": 0.0025,
+      "钙磷合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "钙磷比": 1.3157894736842106
+    },
+    "record_id": "rec24OumcsYXE8"
+  },
+  {
+    "fields": {
+      "1kg总热量kcal": 1092,
+      "NFE计算-干基": 0.0818181818181819,
+      "code": "20250404002",
+      "创建人": [
+        {
+          "avatar_url": "https://s3-imfile.feishucdn.com/static-resource/v1/v3_00tf_4206c5c4-e989-4202-98a3-ae6382ff97dg~?image_size=72x72&cut_type=default-face&quality=&format=jpeg&sticker_format=.webp",
+          "email": "",
+          "en_name": "用户520905",
+          "id": "ou_e06a2facced6a4a429d5ae5805641cc1",
+          "name": "用户520905"
+        }
+      ],
+      "创建日期": 1743775200000,
+      "口味": [
+        {
+          "text": "胡萝卜草鸡",
+          "type": "text"
+        }
+      ],
+      "含水量合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "品牌": "MJAMJAM",
+      "标注kcal": 971.3,
+      "水分含量": 0.78,
+      "照片": [
+        {
+          "file_token": "HQ9JbqeRsotoWuxI7XvcyaYynfc",
+          "name": "photo_1743785401433.JPEG",
+          "size": 591658,
+          "tmp_url": "https://open.feishu.cn/open-apis/drive/v1/medias/batch_get_tmp_download_url?file_tokens=HQ9JbqeRsotoWuxI7XvcyaYynfc&extra=%7B%22bitablePerm%22%3A%7B%22tableId%22%3A%22tbl66lg7CfRlHZVh%22%2C%22rev%22%3A5%7D%7D",
+          "type": "image/jpeg",
+          "url": "https://open.feishu.cn/open-apis/drive/v1/medias/HQ9JbqeRsotoWuxI7XvcyaYynfc/download?extra=%7B%22bitablePerm%22%3A%7B%22tableId%22%3A%22tbl66lg7CfRlHZVh%22%2C%22rev%22%3A5%7D%7D"
+        }
+      ],
+      "碳水kcal": 72,
+      "碳水代谢能占比%": 0.0659,
+      "磷含量-湿基": 0.0025,
+      "磷含量mg/1000kal": 2289.37728937728,
+      "磷含量指标": {
+        "type": 1,
+        "value": [
+          {
+            "text": "中磷",
+            "type": "text"
+          }
+        ]
+      },
+      "磷干物质": 0.011363636363636366,
+      "粗NFE%计【粗碳水】": 0.018,
+      "粗灰分-干基": 0.0818181818181818,
+      "粗灰分合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗灰分含量": 0.018,
+      "粗纤维合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗纤维含量": 0.004,
+      "粗脂肪合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗蛋白合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "罐头简介": [
+        {
+          "text": "MJAMJAM德国魔力喵胡萝卜草鸡口味，70%肉类内脏+高汤配方。含鸡肉、草鸡内脏，满满肉汁，无谷无胶质，天然牛磺酸添加，高蛋白低碳水，适合各年龄段猫咪。",
+          "type": "text"
+        }
+      ],
+      "脂肪-干基": 0.272727272727272,
+      "脂肪kcal": 540,
+      "脂肪代谢能占比%": 0.494505494505494,
+      "脂肪含量": 0.06,
+      "蛋白质-干基": 0.545454545454545,
+      "蛋白质kcal": 480,
+      "蛋白质代谢能占比%": 0.439560439560439,
+      "蛋白质含量": 0.12,
+      "蛋白质含量合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "一般",
+            "type": "text"
+          }
+        ]
+      },
+      "蛋白质：脂肪": 2,
+      "钙含量\nmg|1000kal": 2747.25274725274,
+      "钙含量-湿基": 0.003,
+      "钙干物质": 0.0136363636363636,
+      "钙磷合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "钙磷比": 1.2
+    },
+    "record_id": "rec24OumcsYXXU"
+  },
+  {
+    "fields": {
+      "1kg总热量kcal": 1036,
+      "NFE计算-干基": 0.0636363636363637,
+      "code": "20250404003",
+      "创建人": [
+        {
+          "avatar_url": "https://s3-imfile.feishucdn.com/static-resource/v1/v3_00tf_4206c5c4-e989-4202-98a3-ae6382ff97dg~?image_size=72x72&cut_type=default-face&quality=&format=jpeg&sticker_format=.webp",
+          "email": "",
+          "en_name": "用户520905",
+          "id": "ou_e06a2facced6a4a429d5ae5805641cc1",
+          "name": "用户520905"
+        }
+      ],
+      "创建日期": 1743775200000,
+      "口味": [
+        {
+          "text": "满满鸡",
+          "type": "text"
+        }
+      ],
+      "含水量合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "品牌": "Fellicita",
+      "水分含量": 0.79,
+      "照片": [
+        {
+          "file_token": "KpurbM5wkoKxaExDJfZc8ILwnCc",
+          "name": "photo_1743785426106.JPEG",
+          "size": 660613,
+          "tmp_url": "https://open.feishu.cn/open-apis/drive/v1/medias/batch_get_tmp_download_url?file_tokens=KpurbM5wkoKxaExDJfZc8ILwnCc&extra=%7B%22bitablePerm%22%3A%7B%22tableId%22%3A%22tbl66lg7CfRlHZVh%22%2C%22rev%22%3A5%7D%7D",
+          "type": "image/jpeg",
+          "url": "https://open.feishu.cn/open-apis/drive/v1/medias/KpurbM5wkoKxaExDJfZc8ILwnCc/download?extra=%7B%22bitablePerm%22%3A%7B%22tableId%22%3A%22tbl66lg7CfRlHZVh%22%2C%22rev%22%3A5%7D%7D"
+        }
+      ],
+      "碳水kcal": 56,
+      "碳水代谢能占比%": 0.0513,
+      "磷含量-湿基": 0.0025,
+      "磷含量mg/1000kal": 2413.127413127413,
+      "磷含量指标": {
+        "type": 1,
+        "value": [
+          {
+            "text": "高磷",
+            "type": "text"
+          }
+        ]
+      },
+      "磷干物质": 0.011363636363636366,
+      "粗NFE%计【粗碳水】": 0.014,
+      "粗灰分-干基": 0.1,
+      "粗灰分合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "不合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗灰分含量": 0.022,
+      "粗纤维合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗纤维含量": 0.004,
+      "粗脂肪合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗蛋白合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "罐头简介": [
+        {
+          "text": "Fellicita菲利希塔满满鸡肉口味，德国进口无谷主食罐。71%鸡肉+内脏配方，高肉含量，无谷无麸质，单一肉源低敏配方，营养均衡全面。",
+          "type": "text"
+        }
+      ],
+      "脂肪-干基": 0.27272727272727276,
+      "脂肪kcal": 540,
+      "脂肪代谢能占比%": 0.4945054945054945,
+      "脂肪含量": 0.06,
+      "蛋白质-干基": 0.5000000000000001,
+      "蛋白质kcal": 440,
+      "蛋白质代谢能占比%": 0.402930402930403,
+      "蛋白质含量": 0.11,
+      "蛋白质含量合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "一般",
+            "type": "text"
+          }
+        ]
+      },
+      "蛋白质：脂肪": 1.8333333333333335,
+      "钙含量\nmg|1000kal": 2895.7528957528957,
+      "钙含量-湿基": 0.003,
+      "钙干物质": 0.013636363636363637,
+      "钙磷合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "钙磷比": 1.2
+    },
+    "record_id": "rec24OumcsYYcz"
+  },
+  {
+    "fields": {
+      "1kg总热量kcal": 1036,
+      "NFE计算-干基": 0.0636363636363637,
+      "code": "20250404004",
+      "创建人": [
+        {
+          "avatar_url": "https://s3-imfile.feishucdn.com/static-resource/v1/v3_00tf_4206c5c4-e989-4202-98a3-ae6382ff97dg~?image_size=72x72&cut_type=default-face&quality=&format=jpeg&sticker_format=.webp",
+          "email": "",
+          "en_name": "用户520905",
+          "id": "ou_e06a2facced6a4a429d5ae5805641cc1",
+          "name": "用户520905"
+        }
+      ],
+      "创建日期": 1743775200000,
+      "口味": [
+        {
+          "text": "纯仔鸡",
+          "type": "text"
+        }
+      ],
+      "含水量合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "品牌": "MJAMJAM",
+      "标注kcal": 940,
+      "水分含量": 0.79,
+      "碳水kcal": 56.00000000000005,
+      "碳水代谢能占比%": 0.0513,
+      "磷含量-湿基": 0.002,
+      "磷含量mg/1000kal": 1930.5019305019305,
+      "磷含量指标": {
+        "type": 1,
+        "value": [
+          {
+            "text": "中磷",
+            "type": "text"
+          }
+        ]
+      },
+      "磷干物质": 0.009090909090909092,
+      "粗NFE%计【粗碳水】": 0.014,
+      "粗灰分-干基": 0.1,
+      "粗灰分合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "不合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗灰分含量": 0.022,
+      "粗纤维合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗纤维含量": 0.004,
+      "粗脂肪合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "粗蛋白合格": {
+        "type": 1,
+        "value": [
+          {
+            "text": "合格",
+            "type": "text"
+          }
+        ]
+      },
+      "罐头简介": [
+        {
+          "text": "MJAMJAM德国魔力喵纯仔鸡口味，100%纯肉系列。多汁鸡肉口味，70%鸡肉+心脏+肝脏+胃，高汤28%。无谷无胶无大豆，天然牛磺酸，低敏配方，适合挑嘴猫咪。",
+          "type": "text"
+        }
