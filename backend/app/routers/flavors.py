@@ -5,11 +5,16 @@ from typing import List
 from app.database import get_db
 from app.models.models import Flavor as FlavorModel
 from app.schemas.schemas import Flavor, FlavorCreate, FlavorUpdate
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/flavors", tags=["口味管理"])
 
+class FlavorListResponse(BaseModel):
+    total: int
+    data: List[Flavor]
 
-@router.get("/", response_model=dict)
+
+@router.get("/", response_model=FlavorListResponse)
 def list_flavors(name: str = None, brand_code: int = None, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     query = db.query(FlavorModel).options(joinedload(FlavorModel.brand))
     if brand_code:
@@ -18,7 +23,7 @@ def list_flavors(name: str = None, brand_code: int = None, skip: int = 0, limit:
         query = query.filter(FlavorModel.name.like(f"%{name}%"))
     total = query.count()
     flavors = query.offset(skip).limit(limit).all()
-    return {"total": total, "data": flavors}
+    return FlavorListResponse(total=total, data=flavors)
 
 
 @router.get("/{flavor_code}", response_model=Flavor)
