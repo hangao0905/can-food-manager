@@ -4,12 +4,11 @@ from sqlalchemy import func
 
 from app.database import get_db
 from app.models.models import Brand as BrandModel, Flavor as FlavorModel, CanFood as CanFoodModel, User as UserModel
-from app.routers.auth import get_current_user
 
 router = APIRouter(prefix="/stats", tags=["数据统计"])
 
 @router.get("/")
-def get_stats(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+def get_stats(db: Session = Depends(get_db):
     # 品牌统计
     total_brands = db.query(BrandModel).count()
     domestic_brands = db.query(BrandModel).filter(BrandModel.country == '国内').count()

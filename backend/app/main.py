@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, brands, flavors, can_foods, countries, users, standards
+from app.routers import auth, brands, flavors, can_foods, countries, users, standards, stats
 
 app = FastAPI(title="Can Food Manager API")
 
@@ -27,3 +27,4 @@ app.include_router(can_foods, prefix="/api", tags=["can_foods"])
 app.include_router(countries, prefix="/api", tags=["countries"])
 app.include_router(users, prefix="/api", tags=["users"])
 app.include_router(standards, prefix="/api", tags=["standards"])
+app.include_router(stats, prefix="/api", tags=["stats"])
