@@ -92,7 +92,7 @@ const getColor = (val) => {
 
 onMounted(async () => {
   try {
-    const { data } = await axios.get('/stats/')
+    const { data } = await axios.get('/api/stats/')
     stats.value = data
   } catch (e) {
     console.error('加载统计失败', e)

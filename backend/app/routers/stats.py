@@ -8,7 +8,7 @@ from app.models.models import Brand as BrandModel, Flavor as FlavorModel, CanFoo
 router = APIRouter(prefix="/stats", tags=["数据统计"])
 
 @router.get("/")
-def get_stats(db: Session = Depends(get_db):
+def get_stats(db: Session = Depends(get_db)):
     # 品牌统计
     total_brands = db.query(BrandModel).count()
     domestic_brands = db.query(BrandModel).filter(BrandModel.country == '国内').count()

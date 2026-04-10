@@ -288,4 +288,269 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="标称能量(kcal)">
-              <el-input-number v-model="form.labeled_kcal"
+              <el-input-number v-model="form.labeled_kcal" :min="0" :precision="1" placeholder="可选" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-alert
+          type="info"
+          :closable="false"
+          show-icon
+          style="margin-top: 10px;"
+        >
+          <template #title>
+            <span>提示：以下字段由系统根据标准自动计算</span>
+          </template>
+          <template #default>
+            钙磷比、干物质基础指标(NFE除外)、能量、能量百分比、合格判定等字段由系统根据 /standards 中的标准自动计算，无需手工填写。
+          </template>
+        </el-alert>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit">确定</el-button>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { canFoodApi, flavorApi, brandApi } from '../api'
+
+const canFoods = ref([])
+const flavors = ref([])
+const brands = ref([])
+const loading = ref(false)
+const dialogVisible = ref(false)
+const dialogType = ref('create')
+const total = ref(0)
+
+// 分页参数
+const pagination = ref({
+  page: 1,
+  pageSize: 20
+})
+
+// 查询表单
+const searchForm = ref({
+  brand_code: null,
+  flavor_code: null,
+  min_phosphorus: null,
+  max_phosphorus: null,
+  protein_pass: null,
+  fat_pass: null,
+  fiber_pass: null,
+  ash_pass: null,
+  moisture_pass: null,
+  ca_ph_pass: null
+})
+
+// 对话框表单
+const form = ref({
+  brand_code: null, flavor_code: null, description: '',
+  protein: null, fat: null, moisture: null,
+  phosphorus_wet: null, calcium_wet: null,
+  protein_pass: '合格', fat_pass: '合格'
+})
+
+const dialogTitle = computed(() => dialogType.value === 'create' ? '新增罐头' : '编辑罐头')
+
+// 根据品牌过滤口味
+const filteredFlavors = computed(() => {
+  if (!searchForm.value.brand_code) return flavors.value
+  return flavors.value.filter(f => f.brand_code === searchForm.value.brand_code)
+})
+
+const defaultForm = () => ({
+  brand_code: null, flavor_code: null, description: '',
+  protein: null, fat: null, moisture: null,
+  phosphorus_wet: null, calcium_wet: null,
+  protein_pass: '合格', fat_pass: '合格'
+})
+
+// 加载罐头列表
+const loadCanFoods = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: pagination.value.page,
+      page_size: pagination.value.pageSize
+    }
+    if (searchForm.value.brand_code) params.brand_code = searchForm.value.brand_code
+    if (searchForm.value.flavor_code) params.flavor_code = searchForm.value.flavor_code
+    if (searchForm.value.min_phosphorus) params.min_phosphorus = searchForm.value.min_phosphorus
+    if (searchForm.value.max_phosphorus) params.max_phosphorus = searchForm.value.max_phosphorus
+    if (searchForm.value.protein_pass) params.protein_pass = searchForm.value.protein_pass
+    if (searchForm.value.fat_pass) params.fat_pass = searchForm.value.fat_pass
+    if (searchForm.value.fiber_pass) params.fiber_pass = searchForm.value.fiber_pass
+    if (searchForm.value.ash_pass) params.ash_pass = searchForm.value.ash_pass
+    if (searchForm.value.moisture_pass) params.moisture_pass = searchForm.value.moisture_pass
+    if (searchForm.value.ca_ph_pass) params.ca_ph_pass = searchForm.value.ca_ph_pass
+    
+    const { data } = await canFoodApi.list(params)
+    canFoods.value = data.data || []
+    total.value = data.total || 0
+  } catch (error) {
+    console.error('加载罐头失败', error)
+    ElMessage.error('加载罐头失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 加载口味列表
+const loadFlavors = async () => {
+  try {
+    const { data } = await flavorApi.list({ limit: 1000 })
+    flavors.value = data.data || []
+  } catch (error) {
+    console.error('加载口味失败', error)
+  }
+}
+
+// 加载品牌列表
+const loadBrands = async () => {
+  try {
+    const { data } = await brandApi.list()
+    brands.value = data || []
+  } catch (error) {
+    console.error('加载品牌失败', error)
+  }
+}
+
+// 品牌选择变化
+const handleBrandChange = () => {
+  searchForm.value.flavor_code = null
+}
+
+// 查询
+const handleSearch = () => {
+  pagination.value.page = 1
+  loadCanFoods()
+}
+
+// 重置
+const handleReset = () => {
+  searchForm.value = {
+    brand_code: null,
+    flavor_code: null,
+    min_phosphorus: null,
+    max_phosphorus: null,
+    protein_pass: null,
+    fat_pass: null,
+    fiber_pass: null,
+    ash_pass: null,
+    moisture_pass: null,
+    ca_ph_pass: null
+  }
+  pagination.value.page = 1
+  pagination.value.pageSize = 20
+  loadCanFoods()
+}
+
+// 分页大小改变
+const handleSizeChange = () => {
+  pagination.value.page = 1
+  loadCanFoods()
+}
+
+// 页码改变
+const handlePageChange = () => {
+  loadCanFoods()
+}
+
+const showDialog = (type, row = null) => {
+  dialogType.value = type
+  if (type === 'edit' && row) {
+    form.value = { ...row }
+  } else {
+    form.value = defaultForm()
+  }
+  dialogVisible.value = true
+}
+
+const resetForm = () => {
+  form.value = defaultForm()
+}
+
+const handleSubmit = async () => {
+  try {
+    const data = { ...form.value }
+    if (dialogType.value === 'create') {
+      await canFoodApi.create(data)
+      ElMessage.success('创建成功')
+    } else {
+      await canFoodApi.update(data.code, data)
+      ElMessage.success('更新成功')
+    }
+    dialogVisible.value = false
+    loadCanFoods()
+  } catch (error) {
+    ElMessage.error(error.response?.data?.detail || '操作失败')
+  }
+}
+
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定删除该罐头?', '提示', { type: 'warning' })
+    await canFoodApi.delete(row.code)
+    ElMessage.success('删除成功')
+    loadCanFoods()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+    }
+  }
+}
+
+onMounted(() => {
+  loadCanFoods()
+  loadFlavors()
+  loadBrands()
+})
+</script>
+
+<style scoped>
+.page-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.search-card {
+  flex-shrink: 0;
+}
+
+.result-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pagination-container {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-left: 8px;
+}
+
+:deep(.el-form--inline .el-form-item) {
+  margin-right: 16px;
+  margin-bottom: 12px;
+}
+</style>

@@ -156,14 +156,14 @@ const loadBrands = async () => {
 }
 
 const loadFlavors = async () => {
-  try { const { data } = await flavorApi.list({ page_size: 500 }); flavors.value = data } catch (e) { if (!e.config?._handled) ElMessage.error('加载口味失败') }
+  try { const { data } = await flavorApi.list({ page_size: 500 }); flavors.value = data.data || [] } catch (e) { if (!e.config?._handled) ElMessage.error('加载口味失败') }
 }
 
 const loadAll = async () => {
   loading.value = true
   try {
     const { data } = await canFoodApi.list({ page: 1, page_size: 500 })
-    allCanFoods.value = data
+    allCanFoods.value = data.data || []
   } catch (error) {
     ElMessage.error('加载罐头数据失败')
   } finally {
