@@ -29,7 +29,7 @@ class Brand(BrandBase):
     code: int
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Flavor Schemas
@@ -58,7 +58,7 @@ class Flavor(FlavorBase):
     brand: Optional[Brand] = None
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # CanFood Schemas
@@ -170,7 +170,7 @@ class CanFood(CanFoodBase):
     flavor: Optional[Flavor] = None
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Query Schemas
