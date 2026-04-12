@@ -215,7 +215,7 @@ onMounted(async () => {
       canFoodApi.list({ page_size: 500 })
     ])
     brands.value = bRes.data
-    canFoods.value = cRes.data
+    canFoods.value = cRes.data.data || []
   } catch {
     // ignore
   } finally {
@@ -224,7 +224,7 @@ onMounted(async () => {
   // 单独加载口味列表
   try {
     const fRes = await flavorApi.list({ page_size: 500 })
-    flavors.value = fRes.data
+    flavors.value = fRes.data.data || []
   } catch {
     // ignore
   }

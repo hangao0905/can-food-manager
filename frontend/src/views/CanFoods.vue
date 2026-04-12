@@ -390,8 +390,13 @@ const loadCanFoods = async () => {
     if (searchForm.value.ca_ph_pass) params.ca_ph_pass = searchForm.value.ca_ph_pass
     
     const { data } = await canFoodApi.list(params)
+<<<<<<< HEAD
     canFoods.value = data.data
     total.value = data.total
+=======
+    canFoods.value = data.data || []
+    total.value = data.total || 0
+>>>>>>> 8d51b3785b2fe4728bb9a6169556080f131f162a
   } catch (error) {
     console.error('加载罐头失败', error)
     ElMessage.error('加载罐头失败')
